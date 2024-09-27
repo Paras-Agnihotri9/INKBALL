@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<testsuite name="inkball.SampleTest" tests="1" skipped="0" failures="0" errors="0" timestamp="2024-09-27T10:54:34" hostname="parass-mbp.shared.sydney.edu.au" time="0.007">
+<testsuite name="inkball.SampleTest" tests="1" skipped="0" failures="0" errors="0" timestamp="2024-09-27T12:11:54" hostname="parass-mbp.shared.sydney.edu.au" time="0.007">
   <properties/>
   <testcase name="simpleTest()" classname="inkball.SampleTest" time="0.007"/>
   <system-out><![CDATA[]]></system-out>

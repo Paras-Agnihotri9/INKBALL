@@ -33,6 +33,8 @@ public class App extends PApplet {
     public String configPath;
 
     public static Random random = new Random();
+
+    private HashMap<String, String> ballColorMap;
 	
 	// Feel free to add any additional methods or attributes you want. Please put classes in different files.
 
@@ -61,6 +63,16 @@ public class App extends PApplet {
     boolean[][] occupied;
     int startTime;
 
+
+    private void initializeBallColorMap() {
+        ballColorMap = new HashMap<>();
+        ballColorMap.put("B0", "grey");
+        ballColorMap.put("B1", "orange");
+        ballColorMap.put("B2", "blue");
+        ballColorMap.put("B3", "green");
+        ballColorMap.put("B4", "yellow");
+        // Add more mappings if necessary
+    }
 	@Override
     public void setup() {
         frameRate(FPS);
@@ -99,8 +111,8 @@ public class App extends PApplet {
         spawner = loadImage("src/main/resources/inkball/entrypoint.png");
 
 
-
-        loadLevel("level1.txt");
+        initializeBallColorMap();
+        loadLevel("level3.txt");
         if (board == null) {
             println("Failed to load the board");
         } else {
@@ -154,61 +166,7 @@ public class App extends PApplet {
         //display Board for current level:
         //----------------------------------
         //TODO
-
-        for (int y = 2; y < BOARD_HEIGHT; y++) {
-            for (int x = 0; x < BOARD_WIDTH; x++) {
-                if(occupied[x][y]){
-                    continue;
-                }
-                
-                char tileType = board[x][y];
-                
-                switch (tileType) {
-                    case 'X':
-                        image(walls[0], x * CELLSIZE, y * CELLHEIGHT);
-                        break;
-                    case '1':
-                        image(walls[1], x * CELLSIZE, y * CELLHEIGHT);
-                        break;
-                    case '2':
-                        image(walls[2], x * CELLSIZE, y * CELLHEIGHT);
-                        break;
-                    case '3':
-                        image(walls[3], x * CELLSIZE, y * CELLHEIGHT);
-                        break;
-                    case '4':
-                        image(walls[4], x * CELLSIZE, y * CELLHEIGHT);
-                        break;
-                    case 'S':
-                        image(spawner, x * CELLSIZE, y * CELLHEIGHT);
-                        break;
-                    default:
-                        // Check if it's a hole (e.g., H0, H1, etc.)
-                        if (tileType == 'H' && x + 1 < BOARD_WIDTH && Character.isDigit(board[x + 1][y])) {
-                            int holeType = Character.getNumericValue(board[x + 1][y]);
-                            image(holes[holeType], x * CELLSIZE, y * CELLHEIGHT, CELLSIZE * 2, CELLHEIGHT * 2); // Double size
-
-                            // Mark the cells that are occupied by this larger hole
-                            occupied[x][y] = true;
-                            if (x + 1 < BOARD_WIDTH) {
-                                occupied[x + 1][y] = true;  // Right cell
-                            }
-                            if (y + 1 < BOARD_HEIGHT) {
-                                occupied[x][y + 1] = true;  // Bottom cell
-                            }
-                            if (x + 1 < BOARD_WIDTH && y + 1 < BOARD_HEIGHT) {
-                                occupied[x + 1][y + 1] = true;  // Bottom-right cell
-                            }
-
-                            // Since the hole occupies two cells, skip the next x
-                            x++; 
-                        } else {
-                            image(tile, x * CELLSIZE, y * CELLHEIGHT); // Empty tile
-                        }
-                        break;
-                }
-            }
-        }
+        drawBoard();
         fill(0);
         textSize(15);
         //----------------------------------
@@ -253,8 +211,80 @@ public class App extends PApplet {
             text("Time: " + timeString, WIDTH - 150, TOPBAR / 2 + 10); // Adjust the position as needed
         }
 
+    private void drawBoard() {
+    for (int y = 2; y < BOARD_HEIGHT; y++) {
+        for (int x = 0; x < BOARD_WIDTH; x++) {
+            if (occupied[x][y]) {
+                continue;
+            }
+            
+            char tileType = board[x][y];
+            
+            switch (tileType) {
+                case 'X':
+                    image(walls[0], x * CELLSIZE, y * CELLHEIGHT);
+                    break;
+                case '1':
+                    image(walls[1], x * CELLSIZE, y * CELLHEIGHT);
+                    break;
+                case '2':
+                    image(walls[2], x * CELLSIZE, y * CELLHEIGHT);
+                    break;
+                case '3':
+                    image(walls[3], x * CELLSIZE, y * CELLHEIGHT);
+                    break;
+                case '4':
+                    image(walls[4], x * CELLSIZE, y * CELLHEIGHT);
+                    break;
+                case 'S':
+                    image(spawner, x * CELLSIZE, y * CELLHEIGHT);
+                    break;
+                case 'B':
+                    // Check for balls and their color
+                    if (x + 1 < BOARD_WIDTH && Character.isDigit(board[x + 1][y])) {
+                        String ballId = String.valueOf(tileType) + board[x + 1][y]; // e.g., "B0", "B1"
+                        int ballType = Character.getNumericValue(board[x + 1][y]);
+                        String ballColor = ballColorMap.get(ballId);
+                        if (ballColor != null) {
+                            // Call your ball spawning function here
+                            // spawnBall(ballColor, x * CELLSIZE, y * CELLHEIGHT);
+                        }
+                        // Mark the cell as occupied
+                        occupied[x][y] = true;
+                        x++; // Skip the next x since the ball takes up two columns
+                    }
+                    break;
+                default:
+                    // Check if it's a hole (e.g., H0, H1, etc.)
+                    if (tileType == 'H' && x + 1 < BOARD_WIDTH && Character.isDigit(board[x + 1][y])) {
+                        int holeType = Character.getNumericValue(board[x + 1][y]);
+                        image(holes[holeType], x * CELLSIZE, y * CELLHEIGHT, CELLSIZE * 2, CELLHEIGHT * 2); // Double size
+
+                        // Mark the cells that are occupied by this larger hole
+                        occupied[x][y] = true;
+                        if (x + 1 < BOARD_WIDTH) {
+                            occupied[x + 1][y] = true;  // Right cell
+                        }
+                        if (y + 1 < BOARD_HEIGHT) {
+                            occupied[x][y + 1] = true;  // Bottom cell
+                        }
+                        if (x + 1 < BOARD_WIDTH && y + 1 < BOARD_HEIGHT) {
+                            occupied[x + 1][y + 1] = true;  // Bottom-right cell
+                        }
+
+                        // Since the hole occupies two cells, skip the next x
+                        x++; 
+                    } else {
+                        image(tile, x * CELLSIZE, y * CELLHEIGHT); // Empty tile
+                    }
+                    break;
+            }
+        }
+    }
+}
+
+
     public static void main(String[] args) {
         PApplet.main("inkball.App");
     }
-
 }
