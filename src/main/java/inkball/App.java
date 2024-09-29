@@ -36,6 +36,8 @@ public class App extends PApplet {
 
     private HashMap<String, String> ballColorMap;
 
+    public boolean flag = true;
+
     List<int[]> spawners;
 
     int time;
@@ -46,6 +48,7 @@ public class App extends PApplet {
     float scoreDecreaseModifier;
     int spawnIntervalCounter;
     List<Ball> activeBalls; // List to hold active balls
+    int startTime;
 
 
 	// Feel free to add any additional methods or attributes you want. Please put classes in different files.
@@ -73,7 +76,7 @@ public class App extends PApplet {
     public PImage[] balls;
     public PImage[] holes;
     boolean[][] occupied;
-    int startTime;
+    boolean [][] occupiedBall;
 
 
     private void initializeBallColorMap() {
@@ -97,9 +100,9 @@ public class App extends PApplet {
             throw new RuntimeException(e);
         }*/
     
-        startTime = millis();
         occupied =  new boolean[BOARD_WIDTH][BOARD_HEIGHT];
-        int levelIndex = 0;
+        occupiedBall = new boolean[BOARD_WIDTH][BOARD_HEIGHT];
+        int levelIndex = 1;
         GameConfig gameConfig = new GameConfig(this, "config.json");
         this.time = gameConfig.getTime(levelIndex);
         this.spawnInterval = gameConfig.getSpawnInterval(levelIndex);
@@ -138,6 +141,7 @@ public class App extends PApplet {
         tile = loadImage("src/main/resources/inkball/tile.png");
         spawner = loadImage("src/main/resources/inkball/entrypoint.png");
         loadLevel(layout);
+
         initializeBallColorMap();
         if (board == null) {
             println("Failed to load the board");
@@ -210,8 +214,7 @@ public class App extends PApplet {
             ball.display(this); // Display ball on screen
             System.out.println("Ball position: (" + ball.getX() + ", " + ball.getY() + ")");
         }
-        fill(0);
-        textSize(15);
+        
         //----------------------------------
         //display score
         //----------------------------------
@@ -222,11 +225,12 @@ public class App extends PApplet {
         //display time
         //----------------------------------
         //TODO
-        int elapsedTime = (millis() - startTime) / 1000;
-        text("Time: " + elapsedTime, WIDTH - 150, 60);
+        
 		//----------------------------------
         //----------------------------------
 		//display game end message
+
+        displayTime();
 
     }
 
@@ -250,16 +254,16 @@ public class App extends PApplet {
     System.out.println("Spawners: " + spawners);
 }
 
-    private void displayTime() {
-            long elapsedTime = (millis() - startTime) / 1000; // Calculate elapsed time in seconds
+     private void displayTime() {
+        long elapsedTime = (millis() - startTime) / 1000; // Calculate elapsed time in seconds
 
-            String timeString = String.valueOf(elapsedTime); // Convert to String
+        String timeString = String.valueOf(elapsedTime); // Convert to String
 
-            // Display the time on the right side of the top bar
-            textSize(20);
-            fill(0);
-            text("Time: " + timeString, WIDTH - 150, TOPBAR / 2 + 10); // Adjust the position as needed
-        }
+        // Display the time on the right side of the top bar
+        textSize(20);
+        fill(0);
+        text("Time: " + timeString, WIDTH - 150, TOPBAR / 2 + 10); // Adjust the position as needed
+    }
 
     private void drawBoard() {
     for (int y = 2; y < BOARD_HEIGHT; y++) {
@@ -295,8 +299,10 @@ public class App extends PApplet {
                         String ballId = String.valueOf(tileType) + board[x + 1][y]; // e.g., "B0", "B1"
                         int ballType = Character.getNumericValue(board[x + 1][y]);
                         String ballColor = ballColorMap.get(ballId);
-                        if (ballColor != null) {
-                            // Call your ball spawning function here
+                        if (ballId != null && !occupiedBall[x][y]) {
+                            spawnBallFromBoard(ballColor, x, y);
+                            occupiedBall[x][y] = true;
+                            image(tile, x * CELLSIZE, y * CELLHEIGHT);
                         }
                     }
                     break;
@@ -336,13 +342,17 @@ public void spawnBallFromSpawner(String ballId) {
     int[] spawnerPos = spawners.get(random.nextInt(spawners.size()));
     int x = spawnerPos[0] * CELLSIZE;
     int y = spawnerPos[1] * CELLHEIGHT;
-
-    String ballColor = ballColorMap.get(ballId);
-    Ball newBall = new Ball(x, y, ballColor, balls); // Pass the balls array
+    Ball newBall = new Ball(x, y, ballId, balls); // Pass the balls array
     activeBalls.add(newBall);
-    System.out.println("Spawned ball at: (" + x + ", " + y + ") with color: " + ballColor);
+    System.out.println("Spawned ball at: (" + x + ", " + y + ") with color: " + ballId);
 }
 
+public void spawnBallFromBoard(String ballId, int xCor, int yCor){
+    xCor = xCor * CELLSIZE;
+    yCor = yCor * CELLHEIGHT;
+    Ball newBall = new Ball(xCor, yCor, ballId, balls);
+    activeBalls.add(newBall);
+}
 
     public static void main(String[] args) {
         PApplet.main("inkball.App");
