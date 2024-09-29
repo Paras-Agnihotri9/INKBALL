@@ -87,7 +87,19 @@ public class App extends PApplet {
     
         startTime = millis();
         occupied =  new boolean[BOARD_WIDTH][BOARD_HEIGHT];
-       
+        int levelIndex = 0;
+        GameConfig gameConfig = new GameConfig(this, "config.json");
+        int time = gameConfig.getTime(levelIndex);
+        int spawnInterval = gameConfig.getSpawnInterval(levelIndex);
+        String layout = gameConfig.getLayout(levelIndex);
+        List<String> balls_ingame = gameConfig.getBalls(levelIndex);
+        float scoreIncreaseModifier = gameConfig.getScoreIncreaseModifier(levelIndex);
+        float scoreDecreaseModifier = gameConfig.getScoreDecreaseModifier(levelIndex);
+
+        // Access score modifiers
+        int scoreIncreaseForBlue = gameConfig.getScoreIncrease("blue");
+        int scoreDecreaseForYellow = gameConfig.getScoreDecrease("yellow");
+
         // Load images for walls
         walls = new PImage[5];
         for (int i = 0; i < 5; i++) {
@@ -109,10 +121,9 @@ public class App extends PApplet {
         // Load other images
         tile = loadImage("src/main/resources/inkball/tile.png");
         spawner = loadImage("src/main/resources/inkball/entrypoint.png");
-
-
+        println(layout);
+        loadLevel(layout);
         initializeBallColorMap();
-        loadLevel("level3.txt");
         if (board == null) {
             println("Failed to load the board");
         } else {
@@ -282,7 +293,6 @@ public class App extends PApplet {
         }
     }
 }
-
 
     public static void main(String[] args) {
         PApplet.main("inkball.App");

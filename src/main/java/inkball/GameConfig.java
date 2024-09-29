@@ -19,7 +19,7 @@ public class GameConfig {
         config = applet.loadJSONObject(configPath);
         levels = config.getJSONArray("levels");
 
-        // Initialize the score modifiers
+        // Initialize score modifiers
         scoreIncreaseFromHoleCapture = new HashMap<>();
         scoreDecreaseFromWrongHole = new HashMap<>();
         
@@ -27,40 +27,62 @@ public class GameConfig {
         JSONObject scoreDecrease = config.getJSONObject("score_decrease_from_wrong_hole");
 
         // Populate the score modifiers
-        for (Object key : scoreIncrease.keys()) { // Change String to Object
-            scoreIncreaseFromHoleCapture.put((String) key, scoreIncrease.getInt((String) key)); // Cast to String
+        for (Object key : scoreIncrease.keys()) {
+            scoreIncreaseFromHoleCapture.put((String) key, scoreIncrease.getInt((String) key));
         }
 
-        for (Object key : scoreDecrease.keys()) { // Change String to Object
-            scoreDecreaseFromWrongHole.put((String) key, scoreDecrease.getInt((String) key)); // Cast to String
+        for (Object key : scoreDecrease.keys()) {
+            scoreDecreaseFromWrongHole.put((String) key, scoreDecrease.getInt((String) key));
         }
     }
 
-    public List<Level> getLevels() {
-        List<Level> levelList = new ArrayList<>();
-        for (int i = 0; i < levels.size(); i++) {
-            JSONObject levelObj = levels.getJSONObject(i);
-            JSONArray ballsArray = levelObj.getJSONArray("balls");
-            List<String> balls = new ArrayList<>();
-            for (int j = 0; j < ballsArray.size(); j++) {
-                balls.add(ballsArray.getString(j)); // Convert JSONArray to List<String>
-            }
-            Level level = new Level(
-                levelObj.getString("layout"),
-                levelObj.getInt("time"),
-                levelObj.getInt("spawn_interval"),
-                balls // Pass the List<String> of balls
-            );
-            levelList.add(level);
+    // Method to get level attributes for a specific level index
+    public JSONObject getLevel(int index) {
+        if (index < 0 || index >= levels.size()) {
+            throw new IllegalArgumentException("Invalid level index.");
         }
-        return levelList;
+        return levels.getJSONObject(index);
     }
 
+    // Method to get balls for a specific level
+    public List<String> getBalls(int levelIndex) {
+        JSONObject level = getLevel(levelIndex);
+        JSONArray ballsArray = level.getJSONArray("balls");
+        List<String> balls = new ArrayList<>();
+        for (int i = 0; i < ballsArray.size(); i++) {
+            balls.add(ballsArray.getString(i));
+        }
+        return balls;
+    }
+
+    // Method to get score increase based on ball color
     public int getScoreIncrease(String color) {
         return scoreIncreaseFromHoleCapture.getOrDefault(color, 0);
     }
 
+    // Method to get score decrease based on ball color
     public int getScoreDecrease(String color) {
         return scoreDecreaseFromWrongHole.getOrDefault(color, 0);
+    }
+
+    // Method to access other level-specific data
+    public String getLayout(int levelIndex) {
+        return getLevel(levelIndex).getString("layout");
+    }
+
+    public int getTime(int levelIndex) {
+        return getLevel(levelIndex).getInt("time");
+    }
+
+    public int getSpawnInterval(int levelIndex) {
+        return getLevel(levelIndex).getInt("spawn_interval");
+    }
+
+    public float getScoreIncreaseModifier(int levelIndex) {
+        return getLevel(levelIndex).getFloat("score_increase_from_hole_capture_modifier");
+    }
+
+    public float getScoreDecreaseModifier(int levelIndex) {
+        return getLevel(levelIndex).getFloat("score_decrease_from_wrong_hole_modifier");
     }
 }
