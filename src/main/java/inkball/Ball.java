@@ -14,30 +14,52 @@ public class Ball {
     private String color; // Color of the ball based on its ID
     private float velocityX; // Velocity in the x direction
     private float velocityY; // Velocity in the y direction
-    private PImage image; // Image of the ball
+    private PImage[] balls; // Reference to ball images
 
-    public Ball(float x, float y, String ballId, PImage[] ballImages) {
+    public Ball(float x, float y, String ballColor, PImage[] balls) {
         this.x = x;
         this.y = y;
-        this.color = ballId;
-        this.image = ballImages[Integer.parseInt(ballId.substring(1))]; // Set the correct image based on the ball ID
+        this.color = ballColor;
+        this.balls = balls; // Store the reference
         this.velocityX = VELOCITY_OPTIONS[random.nextInt(2)];
         this.velocityY = VELOCITY_OPTIONS[random.nextInt(2)];
     }
-
 
     public void update() {
         x += velocityX;
         y += velocityY;
 
-        // Check for wall collisions here (to be implemented)
+        // Implement boundary checks to reverse direction if the ball hits the walls
+        if (x < 0 || x > App.WIDTH - App.CELLSIZE) {
+            velocityX *= -1; // Reverse x direction
+        }
+        if (y < 0 || y > App.HEIGHT - App.CELLHEIGHT) {
+            velocityY *= -1; // Reverse y direction
+        }
+    }
+    
+    public void display(PApplet app) {
+        int ballIndex = getColorIndex(color);
+        app.image(balls[ballIndex], x, y);
+    }
+    
+    private int getColorIndex(String color) {
+        switch (color) {
+            case "grey":
+                return 0;
+            case "orange":
+                return 1;
+            case "blue":
+                return 2;
+            case "green":
+                return 3;
+            case "yellow":
+                return 4;
+            default:
+                return 0; // Default to grey if not found
+        }
     }
 
-    public void display(PApplet applet) {
-        applet.image(image, x, y);
-    }
-
-    // Getters for position if needed
     public float getX() {
         return x;
     }
@@ -45,24 +67,5 @@ public class Ball {
     public float getY() {
         return y;
     }
-
-    public String getColor() {
-        return color;
-    }
-
-    // Static method to create a ball from configuration
-    public static Ball spawnBall(String ballId, float x, float y, PImage[] ballImages) {
-        return new Ball(x, y, ballId, ballImages);
-    }
-
-    public float getVelocityX(){
-        return velocityX;
-    }
-
-    public float getVelocityY(){
-        return velocityY;
-    }
-
-    
 
 }
