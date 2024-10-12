@@ -6,7 +6,10 @@ import processing.data.JSONArray;
 import processing.data.JSONObject;
 import processing.event.KeyEvent;
 import processing.event.MouseEvent;
+import processing.core.PConstants;
 
+
+import java.awt.Color;
 import java.io.UnsupportedEncodingException;
 import java.net.URLDecoder;
 import java.nio.charset.StandardCharsets;
@@ -37,6 +40,11 @@ public class App extends PApplet {
     private HashMap<String, String> ballColorMap;
 
     public boolean flag = true;
+
+    private PlayerLine currentLine; // Current line being drawn
+
+    private ArrayList<PlayerLine> playerLines; // All player-drawn lines
+
 
     List<int[]> spawners;
 
@@ -102,7 +110,8 @@ public class App extends PApplet {
     
         occupied =  new boolean[BOARD_WIDTH][BOARD_HEIGHT];
         occupiedBall = new boolean[BOARD_WIDTH][BOARD_HEIGHT];
-        int levelIndex = 1;
+        playerLines = new ArrayList<>();
+        int levelIndex = 0;
         GameConfig gameConfig = new GameConfig(this, "config.json");
         this.time = gameConfig.getTime(levelIndex);
         this.spawnInterval = gameConfig.getSpawnInterval(levelIndex);
@@ -144,6 +153,7 @@ public class App extends PApplet {
 
         initializeBallColorMap();
         if (board == null) {
+
             println("Failed to load the board");
         } else {
             println("Board loaded successfully");
@@ -168,22 +178,57 @@ public class App extends PApplet {
 
     @Override
     public void mousePressed(MouseEvent e) {
-        // create a new player-drawn line object
+        if (mouseButton == PConstants.LEFT) { // Left mouse button
+            // Check if Ctrl key is pressed
+            if (keyPressed && key == PConstants.CONTROL) {
+                // Ctrl + Left Click: Remove the line under the mouse
+                removeLineAtMouse();
+            } else {
+                // Create a new player-drawn line with color black and thickness 10
+                currentLine = new PlayerLine(Color.BLACK, 10);
+                // Add the initial point to the line
+                currentLine.addSegment(mouseX, mouseY);
+            }
+        if(mouseButton == PConstants.RIGHT){
+            removeLineAtMouse();
+        }
+        }
     }
-	
-	@Override
+
+    @Override
     public void mouseDragged(MouseEvent e) {
-        // add line segments to player-drawn line object if left mouse button is held
-		
-		// remove player-drawn line object if right mouse button is held 
-		// and mouse position collides with the line
+        if (mouseButton == PConstants.LEFT && currentLine != null) {
+            // Add line segments as the mouse is dragged
+            currentLine.addSegment(mouseX, mouseY);
+        }
+
+        // Right mouse button or Ctrl + Left click for removing lines
+        if (mouseButton == PConstants.RIGHT || (mouseButton == PConstants.LEFT && keyPressed && key == PConstants.CONTROL)) {
+            removeLineAtMouse();
+        }
     }
 
     @Override
     public void mouseReleased(MouseEvent e) {
-		
+        if (mouseButton == PConstants.LEFT && currentLine != null) {
+            // Add the drawn line to the list of lines and reset the current line
+            playerLines.add(currentLine);
+            currentLine = null;
+        }
     }
 
+    // Helper function to remove a line if mouse is near it
+    private void removeLineAtMouse() {
+        // Check if the mouse position collides with any player-drawn line
+        for (int i = playerLines.size() - 1; i >= 0; i--) {
+            PlayerLine line = playerLines.get(i);
+            if (line.intersects(mouseX, mouseY)) {
+                // Remove the line if collision occurs
+                playerLines.remove(i);
+                break;
+            }
+        }
+    }
     /**
      * Draw all elements in the game by current frame.
      */
@@ -196,24 +241,16 @@ public class App extends PApplet {
         //display Board for current level:
         //----------------------------------
         //TODO
+        resetOccupied();
         drawBoard();
+        spawnIntervalCounterModifier();
+        BallMovement();
+        displayLine();
+        
 
-        if (spawnIntervalCounter > 0) {
-            spawnIntervalCounter--;
-        } else if (!ballsToSpawn.isEmpty()) {
-            // Spawn next ball
-            String nextBall = ballsToSpawn.remove(0); // Get the next ball
-            spawnBallFromSpawner(nextBall);
-            
-            // Reset the interval counter
-            spawnIntervalCounter = spawnInterval * FPS;
-        }
+         
 
-         for (Ball ball : activeBalls) {
-            ball.update(); // Update ball position
-            ball.display(this); // Display ball on screen
-            System.out.println("Ball position: (" + ball.getX() + ", " + ball.getY() + ")");
-        }
+        
         
         //----------------------------------
         //display score
@@ -276,22 +313,54 @@ public class App extends PApplet {
             
             switch (tileType) {
                 case 'X':
+                    if(!occupiedBall[x][y]){
                     image(walls[0], x * CELLSIZE, y * CELLHEIGHT);
+                    }
+                    else{
+                        image(tile, x * CELLSIZE, y * CELLHEIGHT);
+                    }
+                    println("x");
                     break;
                 case '1':
+                    if(!occupiedBall[x][y]){
                     image(walls[1], x * CELLSIZE, y * CELLHEIGHT);
+                    }
+                    else{
+                        image(tile, x * CELLSIZE, y * CELLHEIGHT);
+                    }
+                    println("1");
                     break;
                 case '2':
+                    if(!occupiedBall[x][y]){
                     image(walls[2], x * CELLSIZE, y * CELLHEIGHT);
+                    }
+                    else{
+                        image(tile, x * CELLSIZE, y * CELLHEIGHT);
+                    }
+                    println("2");
                     break;
                 case '3':
+                    
+                    if(!occupiedBall[x][y]){
                     image(walls[3], x * CELLSIZE, y * CELLHEIGHT);
+                    }
+                    else{
+                        image(tile, x * CELLSIZE, y * CELLHEIGHT);
+                    }
+                    println("3");
                     break;
                 case '4':
+                    if(!occupiedBall[x][y]){
                     image(walls[4], x * CELLSIZE, y * CELLHEIGHT);
+                    }
+                    else{
+                        image(tile, x * CELLSIZE, y * CELLHEIGHT);
+                    }
+                    println("4");
                     break;
                 case 'S':
                     image(spawner, x * CELLSIZE, y * CELLHEIGHT);
+                    println("S");
                     break;
                 case 'B':
                     // Check for balls and their color
@@ -302,11 +371,15 @@ public class App extends PApplet {
                         if (ballId != null && !occupiedBall[x][y]) {
                             spawnBallFromBoard(ballColor, x, y);
                             occupiedBall[x][y] = true;
+                            occupiedBall[x+1][y]= true;
+                        }
+                        if(occupiedBall[x][y]){
                             image(tile, x * CELLSIZE, y * CELLHEIGHT);
                         }
+                        println(ballColor);
                     }
                     break;
-                default:
+                case 'H':
                     // Check if it's a hole (e.g., H0, H1, etc.)
                     if (tileType == 'H' && x + 1 < BOARD_WIDTH && Character.isDigit(board[x + 1][y])) {
                         int holeType = Character.getNumericValue(board[x + 1][y]);
@@ -323,12 +396,15 @@ public class App extends PApplet {
                         if (x + 1 < BOARD_WIDTH && y + 1 < BOARD_HEIGHT) {
                             occupied[x + 1][y + 1] = true;  // Bottom-right cell
                         }
-
+                        println("hole"+ holeType);
                         // Since the hole occupies two cells, skip the next x
                         x++; 
                     } else {
                         image(tile, x * CELLSIZE, y * CELLHEIGHT); // Empty tile
                     }
+                    break;
+                default:
+                    image(tile, x * CELLSIZE, y * CELLHEIGHT);
                     break;
             }
         }
@@ -352,6 +428,41 @@ public void spawnBallFromBoard(String ballId, int xCor, int yCor){
     yCor = yCor * CELLHEIGHT;
     Ball newBall = new Ball(xCor, yCor, ballId, balls);
     activeBalls.add(newBall);
+}
+
+private void resetOccupied() {
+    for (int y = 0; y < BOARD_HEIGHT; y++) {
+        for (int x = 0; x < BOARD_WIDTH; x++) {
+            occupied[x][y] = false;  // Reset the occupied flag
+        }
+    }
+}
+
+public void spawnIntervalCounterModifier(){
+    if (spawnIntervalCounter > 0) {
+            spawnIntervalCounter--;
+        } else if (!ballsToSpawn.isEmpty()) {
+            // Spawn next ball
+            String nextBall = ballsToSpawn.remove(0); // Get the next ball
+            spawnBallFromSpawner(nextBall);
+            
+            // Reset the interval counter
+            spawnIntervalCounter = spawnInterval * FPS;
+        }
+}
+
+private void BallMovement() {
+    for (Ball ball : activeBalls) {
+        ball.update();
+        ball.handleWallCollision(board, BOARD_WIDTH, BOARD_HEIGHT+2);
+        ball.display(this); // Render the ball
+    }
+}
+
+public void displayLine(){
+    for (PlayerLine line : playerLines) {
+            line.display(this);
+        }
 }
 
     public static void main(String[] args) {
