@@ -16,6 +16,7 @@ public class Ball {
     public float velocityY; // Velocity in the y direction
     private PImage[] balls; // Reference to ball images
     private int radius = 12;
+    private boolean hasCollided;
     
     public Ball(float x, float y, String ballColor, PImage[] balls) {
         this.x = x;
@@ -24,6 +25,7 @@ public class Ball {
         this.balls = balls; // Store the reference
         this.velocityX = VELOCITY_OPTIONS[random.nextInt(2)];
         this.velocityY = VELOCITY_OPTIONS[random.nextInt(2)];
+        this.hasCollided = false;
     }
 
     public void update() {
@@ -126,4 +128,15 @@ public class Ball {
         this.y = yCordinate;
     }
 
+     public void resetCollision() {
+        hasCollided = false; // Reset for the next frame
+    }
+
+    public boolean hasCollided() {
+        return hasCollided; // Getter for collision status
+    }
+
+    public void setHasCollided(boolean hasCollided) {
+        this.hasCollided = hasCollided; // Setter for collision status
+    }
 }

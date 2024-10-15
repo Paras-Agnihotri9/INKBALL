@@ -461,9 +461,13 @@ private void BallMovement() {
     for (Ball ball : activeBalls) {
         ball.update();
         ball.display(this); // Render the ball
+        ball.resetCollision();
         for (Wall wall : wallsList) {
             //System.out.println("Colliision check called");
             wall.handleCollision(ball); // Check collision and handle response
+        }
+        for (PlayerLine line : playerLines){
+            line.checkCollisionWithBall(ball);
         }
     }
 }
