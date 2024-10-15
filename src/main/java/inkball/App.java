@@ -56,6 +56,7 @@ public class App extends PApplet {
     float scoreDecreaseModifier;
     int spawnIntervalCounter;
     List<Ball> activeBalls; // List to hold active balls
+    List<Wall> wallsList;
     int startTime;
 
 
@@ -121,12 +122,13 @@ public class App extends PApplet {
         this.scoreDecreaseModifier = gameConfig.getScoreDecreaseModifier(levelIndex);
         this.spawnIntervalCounter = this.spawnInterval * FPS; // Ensure this is set correctly
 
-        System.out.println("Balls to spawn: " + ballsToSpawn);
+        //System.out.println("Balls to spawn: " + ballsToSpawn);
 
          // Balls from config file
         int spawnIntervalCounter = spawnInterval * FPS;
 
         activeBalls = new ArrayList<>();
+        wallsList = new ArrayList<>();
 
         // Load images for walls
         walls = new PImage[5];
@@ -154,9 +156,9 @@ public class App extends PApplet {
         initializeBallColorMap();
         if (board == null) {
 
-            println("Failed to load the board");
+            //println("Failed to load the board");
         } else {
-            println("Board loaded successfully");
+            //println("Board loaded successfully");
         }
         }
 
@@ -286,9 +288,13 @@ public class App extends PApplet {
             if (tileType == 'S') {
                 spawners.add(new int[]{x, y + 2});
             }
+
+            if (tileType == 'X' || (tileType >= '1' && tileType <= '4')) {
+                wallsList.add(new Wall(x, (y + 2), tileType));
+            }
         }
     }
-    System.out.println("Spawners: " + spawners);
+    //System.out.println("Spawners: " + spawners);
 }
 
      private void displayTime() {
@@ -319,7 +325,7 @@ public class App extends PApplet {
                     else{
                         image(tile, x * CELLSIZE, y * CELLHEIGHT);
                     }
-                    println("x");
+                    //println("x");
                     break;
                 case '1':
                     if(!occupiedBall[x][y]){
@@ -328,7 +334,7 @@ public class App extends PApplet {
                     else{
                         image(tile, x * CELLSIZE, y * CELLHEIGHT);
                     }
-                    println("1");
+                    //println("1");
                     break;
                 case '2':
                     if(!occupiedBall[x][y]){
@@ -337,7 +343,7 @@ public class App extends PApplet {
                     else{
                         image(tile, x * CELLSIZE, y * CELLHEIGHT);
                     }
-                    println("2");
+                    //println("2");
                     break;
                 case '3':
                     
@@ -347,7 +353,7 @@ public class App extends PApplet {
                     else{
                         image(tile, x * CELLSIZE, y * CELLHEIGHT);
                     }
-                    println("3");
+                    //println("3");
                     break;
                 case '4':
                     if(!occupiedBall[x][y]){
@@ -356,11 +362,11 @@ public class App extends PApplet {
                     else{
                         image(tile, x * CELLSIZE, y * CELLHEIGHT);
                     }
-                    println("4");
+                    //println("4");
                     break;
                 case 'S':
                     image(spawner, x * CELLSIZE, y * CELLHEIGHT);
-                    println("S");
+                    //println("S");
                     break;
                 case 'B':
                     // Check for balls and their color
@@ -376,7 +382,7 @@ public class App extends PApplet {
                         if(occupiedBall[x][y]){
                             image(tile, x * CELLSIZE, y * CELLHEIGHT);
                         }
-                        println(ballColor);
+                        //println(ballColor);
                     }
                     break;
                 case 'H':
@@ -396,7 +402,7 @@ public class App extends PApplet {
                         if (x + 1 < BOARD_WIDTH && y + 1 < BOARD_HEIGHT) {
                             occupied[x + 1][y + 1] = true;  // Bottom-right cell
                         }
-                        println("hole"+ holeType);
+                        //println("hole"+ holeType);
                         // Since the hole occupies two cells, skip the next x
                         x++; 
                     } else {
@@ -420,7 +426,7 @@ public void spawnBallFromSpawner(String ballId) {
     int y = spawnerPos[1] * CELLHEIGHT;
     Ball newBall = new Ball(x, y, ballId, balls); // Pass the balls array
     activeBalls.add(newBall);
-    System.out.println("Spawned ball at: (" + x + ", " + y + ") with color: " + ballId);
+    //System.out.println("Spawned ball at: (" + x + ", " + y + ") with color: " + ballId);
 }
 
 public void spawnBallFromBoard(String ballId, int xCor, int yCor){
@@ -454,8 +460,11 @@ public void spawnIntervalCounterModifier(){
 private void BallMovement() {
     for (Ball ball : activeBalls) {
         ball.update();
-        ball.handleWallCollision(board, BOARD_WIDTH, BOARD_HEIGHT+2);
         ball.display(this); // Render the ball
+        for (Wall wall : wallsList) {
+            //System.out.println("Colliision check called");
+            wall.checkCollision(ball); // Check collision and handle response
+        }
     }
 }
 
