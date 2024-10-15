@@ -463,7 +463,7 @@ private void BallMovement() {
         ball.display(this); // Render the ball
         for (Wall wall : wallsList) {
             //System.out.println("Colliision check called");
-            wall.checkCollision(ball); // Check collision and handle response
+            wall.handleCollision(ball); // Check collision and handle response
         }
     }
 }

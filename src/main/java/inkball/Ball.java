@@ -22,7 +22,6 @@ public class Ball {
         this.y = y;
         this.color = ballColor;
         this.balls = balls; // Store the reference
-        
         this.velocityX = VELOCITY_OPTIONS[random.nextInt(2)];
         this.velocityY = VELOCITY_OPTIONS[random.nextInt(2)];
     }
@@ -63,6 +62,18 @@ public class Ball {
         return y;
     }
 
+    public float getVelocityX(){
+        return velocityX;
+    }
+    public float getVelocityY(){
+        return velocityY;
+    }
+
+    public void setVelocity(float newVelocityX, float newVelocityY){
+    this.velocityX = newVelocityX;  // Update the actual velocity
+    this.velocityY = newVelocityY;  // Update the actual velocity
+    }
+
    
     public int getRadius() {
         return 12; // Fixed radius
@@ -77,16 +88,41 @@ public class Ball {
         velocityY *= -1;  // Reverse Y velocity (vertical direction)
     }
 
+    public void checkPlayerLineCollision(PlayerLine line) {
+        if (line.intersects(x, y)) {
+            // Get the line's normal vector and reflect the ball
+            float[] normal = getNormal(line);
+            reflectBall(normal[0], normal[1]);
+        }
+    }
+
+    // Reflect the ball based on the normal vector of the line
+    private void reflectBall(float normalX, float normalY) {
+        // Calculate dot product between velocity and normal
+        float dotProduct = (velocityX * normalX + velocityY * normalY);
+
+        // Reflect velocity vector using the formula u = v - 2(v ⋅ n)n
+        velocityX = velocityX - 2 * dotProduct * normalX;
+        velocityY = velocityY - 2 * dotProduct * normalY;
+    }
+
+    // Find the normal of the line segment (based on your steps)
+    private float[] getNormal(PlayerLine line) {
+        // For simplicity, return an example normal vector; modify this to calculate real normal
+        return new float[]{0, 1}; // Replace this with actual normal calculation
+    }
+
+
 
     public void setColor(String new_color){
         color = new_color;
     }
     
-    public void setX(int xCordinate){
+    public void setX(float xCordinate){
         this.x = xCordinate;
     }
 
-    public void setY(int yCordinate){
+    public void setY(float yCordinate){
         this.y = yCordinate;
     }
 

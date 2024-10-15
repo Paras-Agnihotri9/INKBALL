@@ -23,69 +23,92 @@ public class Wall {
         return y;
     }
 
-    // Collision detection method
-    private int collisionBuffer = 0; // Add this as a field in the Wall class
+    // Calculate the ball center
+    private float calculateBallCenterX(Ball ball) {
+        return ball.getX() + ball.getRadius();
+    }
 
-public void checkCollision(Ball ball) {
-    float ballX = ball.getX();
-    float ballY = ball.getY();
+    private float calculateBallCenterY(Ball ball) {
+        return ball.getY() + ball.getRadius();
+    }
+
+    // Collision detection method
+    public boolean isOverlapping(Ball ball) {
+        float ballCenterX = calculateBallCenterX(ball);
+        float ballCenterY = calculateBallCenterY(ball);
+        int ballRadius = ball.getRadius();
+
+        // Wall coordinates
+        int wallLeft = x * App.CELLSIZE;
+        int wallRight = wallLeft + App.CELLSIZE;
+        int wallTop = y * App.CELLHEIGHT;
+        int wallBottom = wallTop + App.CELLHEIGHT;
+
+        // Check for overlap (AABB collision detection)
+        boolean overlap = ballCenterX + ballRadius > wallLeft && ballCenterX - ballRadius < wallRight &&
+                          ballCenterY + ballRadius > wallTop && ballCenterY - ballRadius < wallBottom;
+
+        return overlap;
+    }
+
+    private int collisionBuffer = 0; // Add a buffer to handle repeated collisions
+
+public void handleCollision(Ball ball) {
+    if (!isOverlapping(ball)) return;  // No collision detected
+
+    float ballCenterX = calculateBallCenterX(ball);  // Get ball's center
+    float ballCenterY = calculateBallCenterY(ball);
     int ballRadius = ball.getRadius();
 
-    // Wall coordinates
+    // Wall boundaries (assumed to be rectangular grid cells)
     int wallLeft = x * App.CELLSIZE;
     int wallRight = wallLeft + App.CELLSIZE;
     int wallTop = y * App.CELLHEIGHT;
     int wallBottom = wallTop + App.CELLHEIGHT;
 
-    boolean collisionDetected = false;
+    // Calculate distances from ball edge to the wall edges
+    float distToLeft = (ballCenterX - ballRadius) - wallLeft;
+    float distToRight = wallRight - (ballCenterX + ballRadius);
+    float distToTop = (ballCenterY - ballRadius) - wallTop;
+    float distToBottom = wallBottom - (ballCenterY + ballRadius);
 
-    // Check horizontal collision
-    if (collisionBuffer % Math.abs(ball.velocityX) == 0) {
-        // Check left side collision
-        if (ballX + 2 * ballRadius > wallLeft && ballX < wallLeft && ballY > wallTop && ballY < wallBottom) {
-            ball.reverseHorizontalDirection(); // Reverse X velocity
-            collisionBuffer = 1; // Reset buffer
-            collisionDetected = true;
-            System.out.println("Right collision detected");
-        }
+    // Find the closest side by checking the smallest distance
+    float minDistance = Math.min(Math.min(distToLeft, distToRight), Math.min(distToTop, distToBottom));
 
-        // Check right side collision
-        if (ballX < wallRight && ballX + 2 * ballRadius > wallRight && ballY > wallTop && ballY < wallBottom) {
-            ball.reverseHorizontalDirection(); // Reverse X velocity
-            collisionBuffer = 1; // Reset buffer
-            collisionDetected = true;
-            System.out.println("Left collision detected");
-        }
-
-        // Check vertical collision
-        if (ballY + 2 * ballRadius > wallTop && ballY < wallTop && ballX > wallLeft && ballX < wallRight) {
-            ball.reverseVerticalDirection(); // Reverse Y velocity
-            collisionBuffer = 1; // Reset buffer
-            collisionDetected = true;
-            System.out.println("Bottom collision detected");
-        }
-
-        // Check bottom side collision
-        if (ballY < wallBottom && ballY + 2 * ballRadius > wallBottom && ballX > wallLeft && ballX < wallRight) {
-            ball.reverseVerticalDirection(); // Reverse Y velocity
-            collisionBuffer = 1; // Reset buffer
-            collisionDetected = true;
-            System.out.println("Top collision detected");
-        }
-    } else {
-        collisionBuffer++; // Increment buffer
+    // Reflect the ball based on the closest side and adjust its position
+    if (minDistance == distToLeft) {
+        // Ball hit the left side of the wall, reverse X direction
+        ball.reverseHorizontalDirection();
+        ball.setX(wallLeft - 2 * ballRadius);  // Move ball just outside the left wall boundary
+    } else if (minDistance == distToRight) {
+        // Ball hit the right side of the wall, reverse X direction
+        ball.reverseHorizontalDirection();
+        ball.setX(wallRight);  // Move ball just outside the right wall boundary
+    } else if (minDistance == distToTop) {
+        // Ball hit the top side of the wall, reverse Y direction
+        ball.reverseVerticalDirection();
+        ball.setY(wallTop - 2 * ballRadius);  // Move ball just outside the top wall boundary
+    } else if (minDistance == distToBottom) {
+        // Ball hit the bottom side of the wall, reverse Y direction
+        ball.reverseVerticalDirection();
+        ball.setY(wallBottom);  // Move ball just outside the bottom wall boundary
     }
 
     // Handle color change for colored walls
-    if (collisionDetected && Character.isDigit(wallType)) {
+    if (Character.isDigit(wallType)) {
         String newColor = getWallColor(wallType);
         ball.setColor(newColor);
     }
 }
 
+    public void updateCollisionBuffer() {
+        if (collisionBuffer > 0) {
+            collisionBuffer--;
+        }
+    }
 
 
-private String getWallColor(char wallTile) {
+    private String getWallColor(char wallTile) {
         switch (wallTile) {
             case 'X': return "grey";
             case '1': return "orange";
@@ -95,5 +118,4 @@ private String getWallColor(char wallTile) {
             default: return "grey";
         }
     }
-
 }
