@@ -28,6 +28,7 @@ public class App extends PApplet {
     public static int HEIGHT = 640; //BOARD_HEIGHT*CELLSIZE+TOPBAR;
     public static final int BOARD_WIDTH = WIDTH/CELLSIZE;
     public static final int BOARD_HEIGHT = 20;
+    public static int score = 0;
 
     public static final int INITIAL_PARACHUTES = 1;
 
@@ -45,6 +46,7 @@ public class App extends PApplet {
 
     private ArrayList<PlayerLine> playerLines; // All player-drawn lines
 
+    //List<Hole> holesList; // List to hold holes
 
     List<int[]> spawners;
 
@@ -112,7 +114,8 @@ public class App extends PApplet {
         occupied =  new boolean[BOARD_WIDTH][BOARD_HEIGHT];
         occupiedBall = new boolean[BOARD_WIDTH][BOARD_HEIGHT];
         playerLines = new ArrayList<>();
-        int levelIndex = 0;
+        //holesList = new ArrayList<>();
+        int levelIndex = 2;
         GameConfig gameConfig = new GameConfig(this, "config.json");
         this.time = gameConfig.getTime(levelIndex);
         this.spawnInterval = gameConfig.getSpawnInterval(levelIndex);
@@ -213,7 +216,8 @@ public class App extends PApplet {
     @Override
     public void mouseReleased(MouseEvent e) {
         if (mouseButton == PConstants.LEFT && currentLine != null) {
-            // Add the drawn line to the list of lines and reset the current line
+            // Mark the line as complete once the mouse is released
+            currentLine.setComplete(true);
             playerLines.add(currentLine);
             currentLine = null;
         }
@@ -283,19 +287,36 @@ public class App extends PApplet {
     for (int y = 0; y < lines.length; y++) {
         for (int x = 0; x < lines[y].length(); x++) {
             char tileType = lines[y].charAt(x);
-            board[x][y+2] = tileType;
+            // Store the tile type in the board, ensuring we don't go out of bounds
+            if (y + 2 < BOARD_HEIGHT) {
+                board[x][y + 2] = tileType;
+            }
             
+            // Check for spawners
             if (tileType == 'S') {
                 spawners.add(new int[]{x, y + 2});
             }
-
+            if(tileType == 'H'){
+                //holesList.add(new Hole());
+            }
+            // Check for walls, while skipping balls and holes
             if (tileType == 'X' || (tileType >= '1' && tileType <= '4')) {
-                wallsList.add(new Wall(x, (y + 2), tileType));
+                // If the previous tile is not a ball or hole, add to wallsList
+                if (tileType != 'X') {
+                    if (x > 0 && (board[x - 1][y + 2] != 'B' && board[x - 1][y + 2] != 'H')) {
+                        wallsList.add(new Wall(x, (y + 2), tileType));
+                        System.out.println("New wall added "+ tileType + "at" + x + " "+ y);
+                    }
+                } else {
+                    // Add 'X' walls directly
+                    wallsList.add(new Wall(x, (y + 2), tileType));
+                }
             }
         }
     }
-    //System.out.println("Spawners: " + spawners);
+    // System.out.println("Spawners: " + spawners);
 }
+
 
      private void displayTime() {
         long elapsedTime = (millis() - startTime) / 1000; // Calculate elapsed time in seconds
@@ -462,21 +483,51 @@ private void BallMovement() {
         ball.update();
         ball.display(this); // Render the ball
         ball.resetCollision();
+
         for (Wall wall : wallsList) {
-            //System.out.println("Colliision check called");
-            wall.handleCollision(ball); // Check collision and handle response
+            wall.handleCollision(ball); // Handle wall collisions
         }
-        for (PlayerLine line : playerLines){
-            line.checkCollisionWithBall(ball);
+
+        // Iterate over lines and check for collisions, but only if the line is complete
+        Iterator<PlayerLine> lineIterator = playerLines.iterator();
+        while (lineIterator.hasNext()) {
+            PlayerLine line = lineIterator.next();
+            if (line.isComplete()) {
+                line.checkCollisionWithBall(ball);
+                if (ball.hasCollided()) {
+                    lineIterator.remove(); // Remove the line if there's a collision
+                }
+            }
         }
     }
 }
 
-public void displayLine(){
-    for (PlayerLine line : playerLines) {
-            line.display(this);
+
+
+
+    public void displayLine(){
+        for (PlayerLine line : playerLines) {
+                line.display(this);
+            }
+    }
+    public void removeLine(PlayerLine line) {
+        playerLines.remove(line);
+    }
+
+    public void checkBallCollisions() {
+    // Iterate over active balls and check for collisions with each line
+    for (Ball ball : activeBalls) {
+        // Iterate over lines and check for collisions
+        for (int i = playerLines.size() - 1; i >= 0; i--) {
+            PlayerLine line = playerLines.get(i);
+            if (line.checkCollisionWithBall(ball)) {
+                playerLines.remove(i); // Remove the line if a collision occurred
+            }
         }
+    }
 }
+
+
 
     public static void main(String[] args) {
         PApplet.main("inkball.App");

@@ -15,9 +15,17 @@ public class Ball {
     public float velocityX; // Velocity in the x direction
     public float velocityY; // Velocity in the y direction
     private PImage[] balls; // Reference to ball images
-    private int radius = 12;
+    private int originalSize = 24; // Original size of the ball (width and height of the image)
+    private float currentSize; // Current size of the ball for scaling
     private boolean hasCollided;
-    
+    public static int score = 0;
+    public boolean captured;
+
+    // Variables for shrinking animation
+    private boolean shrinking = false;
+    private float targetSize = 12; // Target smaller size for shrinking
+    private float shrinkRate = 0.5f; // Rate at which the ball will shrink
+
     public Ball(float x, float y, String ballColor, PImage[] balls) {
         this.x = x;
         this.y = y;
@@ -26,18 +34,27 @@ public class Ball {
         this.velocityX = VELOCITY_OPTIONS[random.nextInt(2)];
         this.velocityY = VELOCITY_OPTIONS[random.nextInt(2)];
         this.hasCollided = false;
+        this.captured = true;
+        this.currentSize = originalSize; // Start at the original size
     }
 
     public void update() {
+        // Move the ball by velocity
         x += velocityX;
         y += velocityY;
+
+        // Handle shrinking logic if the ball is in shrink mode
+        if (shrinking) {
+            shrinkBall();
+        }
     }
-    
+
     public void display(PApplet app) {
         int ballIndex = getColorIndex(color);
-        app.image(balls[ballIndex], x, y);
+        // Display the ball image at the current size (scale the image)
+        app.image(balls[ballIndex], x, y, currentSize, currentSize);
     }
-    
+
     private int getColorIndex(String color) {
         switch (color) {
             case "grey":
@@ -55,6 +72,19 @@ public class Ball {
         }
     }
 
+    public void startShrinking() {
+        shrinking = true;
+    }
+
+    private void shrinkBall() {
+        if (currentSize > targetSize) {
+            currentSize -= shrinkRate; // Gradually reduce the size
+            if (currentSize < targetSize) {
+                currentSize = targetSize; // Ensure it doesn't shrink below the target size
+                shrinking = false; // Stop shrinking once the target size is reached
+            }
+        }
+    }
 
     public float getX() {
         return x;
@@ -64,23 +94,24 @@ public class Ball {
         return y;
     }
 
-    public float getVelocityX(){
+    public float getVelocityX() {
         return velocityX;
     }
-    public float getVelocityY(){
+
+    public float getVelocityY() {
         return velocityY;
     }
 
-    public void setVelocity(float newVelocityX, float newVelocityY){
-    this.velocityX = newVelocityX;  // Update the actual velocity
-    this.velocityY = newVelocityY;  // Update the actual velocity
+    public void setVelocity(float newVelocityX, float newVelocityY) {
+        this.velocityX = newVelocityX;  // Update the actual velocity
+        this.velocityY = newVelocityY;  // Update the actual velocity
+        System.out.println("VelocityX" + velocityX);
+        System.out.println("VelocityY" + velocityY);
     }
 
-   
-    public int getRadius() {
-        return 12; // Fixed radius
+    public int getOriginalSize() {
+        return originalSize;
     }
-
 
     public void reverseHorizontalDirection() {
         velocityX *= -1;  // Reverse X velocity (horizontal direction)
@@ -90,45 +121,19 @@ public class Ball {
         velocityY *= -1;  // Reverse Y velocity (vertical direction)
     }
 
-    public void checkPlayerLineCollision(PlayerLine line) {
-        if (line.intersects(x, y)) {
-            // Get the line's normal vector and reflect the ball
-            float[] normal = getNormal(line);
-            reflectBall(normal[0], normal[1]);
-        }
-    }
-
-    // Reflect the ball based on the normal vector of the line
-    private void reflectBall(float normalX, float normalY) {
-        // Calculate dot product between velocity and normal
-        float dotProduct = (velocityX * normalX + velocityY * normalY);
-
-        // Reflect velocity vector using the formula u = v - 2(v ⋅ n)n
-        velocityX = velocityX - 2 * dotProduct * normalX;
-        velocityY = velocityY - 2 * dotProduct * normalY;
-    }
-
-    // Find the normal of the line segment (based on your steps)
-    private float[] getNormal(PlayerLine line) {
-        // For simplicity, return an example normal vector; modify this to calculate real normal
-        return new float[]{0, 1}; // Replace this with actual normal calculation
-    }
-
-
-
-    public void setColor(String new_color){
+    public void setColor(String new_color) {
         color = new_color;
     }
-    
-    public void setX(float xCordinate){
+
+    public void setX(float xCordinate) {
         this.x = xCordinate;
     }
 
-    public void setY(float yCordinate){
+    public void setY(float yCordinate) {
         this.y = yCordinate;
     }
 
-     public void resetCollision() {
+    public void resetCollision() {
         hasCollided = false; // Reset for the next frame
     }
 
@@ -139,4 +144,26 @@ public class Ball {
     public void setHasCollided(boolean hasCollided) {
         this.hasCollided = hasCollided; // Setter for collision status
     }
+
+    public void applyForce(float forceX, float forceY) {
+        this.velocityX += forceX;
+        this.velocityY += forceY;
+    }
+
+    public String getColor() {
+        return color;
+    }
+
+    public void setCaptured(boolean captured) {
+        this.captured = captured; // or whatever logic you want for capturing
+    }
+
+    public int getRadius() {
+        return 12; // Fixed radius
+    }
+
+    public void setSize(){
+        System.out.println("ahahahh");
+    }
+
 }
