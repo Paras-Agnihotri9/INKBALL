@@ -54,13 +54,14 @@ public class App extends PApplet {
     int spawnInterval;
     String layout;
     List<String> ballsToSpawn;
-    float scoreIncreaseModifier;
-    float scoreDecreaseModifier;
+    public static float scoreIncreaseModifier;
+    public static float scoreDecreaseModifier;
     int spawnIntervalCounter;
     List<Ball> activeBalls; // List to hold active balls
     List<Wall> wallsList;
+    List<Hole> holesList;
     int startTime;
-
+    int currentLevelIndex = 0;
 
 	// Feel free to add any additional methods or attributes you want. Please put classes in different files.
 
@@ -110,21 +111,10 @@ public class App extends PApplet {
         } catch (UnsupportedEncodingException e) {
             throw new RuntimeException(e);
         }*/
-    
         occupied =  new boolean[BOARD_WIDTH][BOARD_HEIGHT];
         occupiedBall = new boolean[BOARD_WIDTH][BOARD_HEIGHT];
         playerLines = new ArrayList<>();
-        //holesList = new ArrayList<>();
-        int levelIndex = 2;
-        GameConfig gameConfig = new GameConfig(this, "config.json");
-        this.time = gameConfig.getTime(levelIndex);
-        this.spawnInterval = gameConfig.getSpawnInterval(levelIndex);
-        this.layout = gameConfig.getLayout(levelIndex);
-        this.ballsToSpawn = gameConfig.getBalls(levelIndex);
-        this.scoreIncreaseModifier = gameConfig.getScoreIncreaseModifier(levelIndex);
-        this.scoreDecreaseModifier = gameConfig.getScoreDecreaseModifier(levelIndex);
-        this.spawnIntervalCounter = this.spawnInterval * FPS; // Ensure this is set correctly
-
+        holesList = new ArrayList<>();
         //System.out.println("Balls to spawn: " + ballsToSpawn);
 
          // Balls from config file
@@ -154,20 +144,60 @@ public class App extends PApplet {
         // Load other images
         tile = loadImage("src/main/resources/inkball/tile.png");
         spawner = loadImage("src/main/resources/inkball/entrypoint.png");
-        loadLevel(layout);
 
         initializeBallColorMap();
         if (board == null) {
-
-            //println("Failed to load the board");
+            println("Failed to load the board");
         } else {
-            //println("Board loaded successfully");
+            println("Board loaded successfully");
         }
+
+        setupLevel(currentLevelIndex);
         }
 
     /**
      * Receive key pressed signal from the keyboard.
      */
+    private void setupLevel(int levelIndex) {
+        GameConfig gameConfig = new GameConfig(this, "config.json");
+        this.time = gameConfig.getTime(levelIndex);
+        this.spawnInterval = gameConfig.getSpawnInterval(levelIndex);
+        this.layout = gameConfig.getLayout(levelIndex);
+        this.ballsToSpawn = gameConfig.getBalls(levelIndex);
+        this.scoreIncreaseModifier = gameConfig.getScoreIncreaseModifier(levelIndex);
+        this.scoreDecreaseModifier = gameConfig.getScoreDecreaseModifier(levelIndex);
+        this.spawnIntervalCounter = this.spawnInterval * FPS;
+        // Load the level layout
+        loadLevel(layout);
+    }
+
+    private void checkLevelCompletion() {
+        if (allBallsAbsorbed()) {
+            currentLevelIndex++; // Move to the next level
+            setupLevel(currentLevelIndex);
+        } else if (timeReached()) {
+            // Stop displaying timer and score
+            displayGameEndMessage();
+        }
+    }
+
+    private boolean allBallsAbsorbed() {
+        return activeBalls.isEmpty();
+    }
+
+    private boolean timeReached() {
+        long elapsedTime = (millis() - startTime) / 1000; // Calculate elapsed time in seconds
+        return elapsedTime >= time;
+    }
+
+    private void displayGameEndMessage() {
+        fill(0);
+        textAlign(CENTER);
+        textSize(32);
+        text("ENDED", WIDTH / 2, HEIGHT / 2);
+    }
+
+
 	@Override
     public void keyPressed(KeyEvent event){
         
@@ -240,7 +270,7 @@ public class App extends PApplet {
      */
 	@Override
     public void draw() {
-        
+        background(255);
        //String filepath = 
 
         //----------------------------------
@@ -253,7 +283,7 @@ public class App extends PApplet {
         BallMovement();
         displayLine();
         
-
+        checkLevelCompletion();
          
 
         
@@ -262,7 +292,7 @@ public class App extends PApplet {
         //display score
         //----------------------------------
         //TODO
-        text("Score: ", WIDTH - 150, 30); 
+        text("Score: " + score, WIDTH - 150, 40); 
         
         //----------------------------------
         //display time
@@ -280,42 +310,49 @@ public class App extends PApplet {
     char[][] board;
 
     public void loadLevel(String filepath) {
-    board = new char[BOARD_WIDTH][BOARD_HEIGHT];
-    spawners = new ArrayList<>();
-    String[] lines = loadStrings(filepath);
+        board = new char[BOARD_WIDTH][BOARD_HEIGHT];
+        spawners = new ArrayList<>();
+        String[] lines = loadStrings(filepath);
 
-    for (int y = 0; y < lines.length; y++) {
-        for (int x = 0; x < lines[y].length(); x++) {
-            char tileType = lines[y].charAt(x);
-            // Store the tile type in the board, ensuring we don't go out of bounds
-            if (y + 2 < BOARD_HEIGHT) {
-                board[x][y + 2] = tileType;
-            }
-            
-            // Check for spawners
-            if (tileType == 'S') {
-                spawners.add(new int[]{x, y + 2});
-            }
-            if(tileType == 'H'){
-                //holesList.add(new Hole());
-            }
-            // Check for walls, while skipping balls and holes
-            if (tileType == 'X' || (tileType >= '1' && tileType <= '4')) {
-                // If the previous tile is not a ball or hole, add to wallsList
-                if (tileType != 'X') {
-                    if (x > 0 && (board[x - 1][y + 2] != 'B' && board[x - 1][y + 2] != 'H')) {
-                        wallsList.add(new Wall(x, (y + 2), tileType));
-                        System.out.println("New wall added "+ tileType + "at" + x + " "+ y);
+        for (int y = 0; y < lines.length; y++) {
+            for (int x = 0; x < lines[y].length(); x++) {
+                char tileType = lines[y].charAt(x);
+                // Store the tile type in the board, ensuring we don't go out of bounds
+                if (y + 2 < BOARD_HEIGHT) {
+                    board[x][y + 2] = tileType;
+                }
+                
+                // Check for spawners
+                if (tileType == 'S') {
+                    spawners.add(new int[]{x, y + 2});
+                }
+                if (tileType == 'H') {
+                    // Check if there's a character after 'H' and it's a digit
+                    if (x + 1 < lines[y].length() && Character.isDigit(lines[y].charAt(x + 1))) {
+                        char holeType = lines[y].charAt(x + 1);
+                        System.out.println(" x " + x + " y " + y + " type: " + holeType);
+                        holesList.add(new Hole(x, y + 2, holeType));
+                    } else {
+                        System.out.println("Error: Expected a number after 'H' but found none or invalid.");
                     }
-                } else {
-                    // Add 'X' walls directly
-                    wallsList.add(new Wall(x, (y + 2), tileType));
+                }
+
+                // Check for walls, while skipping balls and holes
+                if (tileType == 'X' || (tileType >= '1' && tileType <= '4')) {
+                    // If the previous tile is not a ball or hole, add to wallsList
+                    if (tileType != 'X') {
+                        if (x > 0 && (board[x - 1][y + 2] != 'B' && board[x - 1][y + 2] != 'H')) {
+                            wallsList.add(new Wall(x, (y + 2), tileType));
+                            System.out.println("New wall added "+ tileType + "at" + x + " "+ y);
+                        }
+                    } else {
+                        // Add 'X' walls directly
+                        wallsList.add(new Wall(x, (y + 2), tileType));
+                    }
                 }
             }
         }
     }
-    // System.out.println("Spawners: " + spawners);
-}
 
 
      private void displayTime() {
@@ -324,9 +361,8 @@ public class App extends PApplet {
         String timeString = String.valueOf(elapsedTime); // Convert to String
 
         // Display the time on the right side of the top bar
-        textSize(20);
         fill(0);
-        text("Time: " + timeString, WIDTH - 150, TOPBAR / 2 + 10); // Adjust the position as needed
+        text("Time: " + timeString, WIDTH - 150, TOPBAR / 2 + 25); // Adjust the position as needed
     }
 
     private void drawBoard() {
@@ -438,71 +474,74 @@ public class App extends PApplet {
     }
 }
 
-public void spawnBallFromSpawner(String ballId) {
-    if (spawners.isEmpty()) return; // No spawners found
+    public void spawnBallFromSpawner(String ballId) {
+        if (spawners.isEmpty()) return; // No spawners found
 
-    // Randomly select a spawner
-    int[] spawnerPos = spawners.get(random.nextInt(spawners.size()));
-    int x = spawnerPos[0] * CELLSIZE;
-    int y = spawnerPos[1] * CELLHEIGHT;
-    Ball newBall = new Ball(x, y, ballId, balls); // Pass the balls array
-    activeBalls.add(newBall);
-    //System.out.println("Spawned ball at: (" + x + ", " + y + ") with color: " + ballId);
-}
-
-public void spawnBallFromBoard(String ballId, int xCor, int yCor){
-    xCor = xCor * CELLSIZE;
-    yCor = yCor * CELLHEIGHT;
-    Ball newBall = new Ball(xCor, yCor, ballId, balls);
-    activeBalls.add(newBall);
-}
-
-private void resetOccupied() {
-    for (int y = 0; y < BOARD_HEIGHT; y++) {
-        for (int x = 0; x < BOARD_WIDTH; x++) {
-            occupied[x][y] = false;  // Reset the occupied flag
-        }
+        // Randomly select a spawner
+        int[] spawnerPos = spawners.get(random.nextInt(spawners.size()));
+        int x = spawnerPos[0] * CELLSIZE;
+        int y = spawnerPos[1] * CELLHEIGHT;
+        Ball newBall = new Ball(x, y, ballId, balls); // Pass the balls array
+        activeBalls.add(newBall);
+        //System.out.println("Spawned ball at: (" + x + ", " + y + ") with color: " + ballId);
     }
-}
 
-public void spawnIntervalCounterModifier(){
-    if (spawnIntervalCounter > 0) {
-            spawnIntervalCounter--;
-        } else if (!ballsToSpawn.isEmpty()) {
-            // Spawn next ball
-            String nextBall = ballsToSpawn.remove(0); // Get the next ball
-            spawnBallFromSpawner(nextBall);
-            
-            // Reset the interval counter
-            spawnIntervalCounter = spawnInterval * FPS;
-        }
-}
+    public void spawnBallFromBoard(String ballId, int xCor, int yCor){
+        xCor = xCor * CELLSIZE;
+        yCor = yCor * CELLHEIGHT;
+        Ball newBall = new Ball(xCor, yCor, ballId, balls);
+        activeBalls.add(newBall);
+    }
 
-private void BallMovement() {
-    for (Ball ball : activeBalls) {
-        ball.update();
-        ball.display(this); // Render the ball
-        ball.resetCollision();
-
-        for (Wall wall : wallsList) {
-            wall.handleCollision(ball); // Handle wall collisions
-        }
-
-        // Iterate over lines and check for collisions, but only if the line is complete
-        Iterator<PlayerLine> lineIterator = playerLines.iterator();
-        while (lineIterator.hasNext()) {
-            PlayerLine line = lineIterator.next();
-            if (line.isComplete()) {
-                line.checkCollisionWithBall(ball);
-                if (ball.hasCollided()) {
-                    lineIterator.remove(); // Remove the line if there's a collision
-                }
+    private void resetOccupied() {
+        for (int y = 0; y < BOARD_HEIGHT; y++) {
+            for (int x = 0; x < BOARD_WIDTH; x++) {
+                occupied[x][y] = false;  // Reset the occupied flag
             }
         }
     }
-}
 
+    public void spawnIntervalCounterModifier(){
+        if (spawnIntervalCounter > 0) {
+                spawnIntervalCounter--;
+            } else if (!ballsToSpawn.isEmpty()) {
+                // Spawn next ball
+                String nextBall = ballsToSpawn.remove(0); // Get the next ball
+                spawnBallFromSpawner(nextBall);
+                
+                // Reset the interval counter
+                spawnIntervalCounter = spawnInterval * FPS;
+            }
+    }
 
+    private void BallMovement() {
+        for (Ball ball : activeBalls) {
+            ball.update();
+            ball.display(this); // Render the ball
+            ball.resetCollision();
+
+            for (Wall wall : wallsList) {
+                wall.handleCollision(ball); // Handle wall collisions
+            }
+
+            for (Hole hole : holesList) {
+                ball.attractToHole(hole); // Check attraction for each ball
+            }
+
+            // Iterate over lines and check for collisions, but only if the line is complete
+            Iterator<PlayerLine> lineIterator = playerLines.iterator();
+            while (lineIterator.hasNext()) {
+                PlayerLine line = lineIterator.next();
+                if (line.isComplete()) {
+                    line.checkCollisionWithBall(ball);
+                    if (ball.hasCollided()) {
+                        lineIterator.remove(); // Remove the line if there's a collision
+                    }
+                }
+            }
+        }
+        
+    }
 
 
     public void displayLine(){
@@ -526,8 +565,6 @@ private void BallMovement() {
         }
     }
 }
-
-
 
     public static void main(String[] args) {
         PApplet.main("inkball.App");

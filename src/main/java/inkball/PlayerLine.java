@@ -10,6 +10,7 @@ public class PlayerLine {
     private Color color;                 // Line color
     private int thickness;               // Line thickness
     private boolean complete;
+    
     public PlayerLine(Color color, int thickness) {
         this.segments = new ArrayList<>();
         this.color = color;
@@ -45,22 +46,22 @@ public class PlayerLine {
 
     // Check if the ball is colliding with the line segment defined by points P1 and P2
     // Check if the ball is colliding with the line segment defined by points P1 and P2
-public boolean checkCollisionWithBall(Ball ball) {
-    if (ball.hasCollided()) return false; // Ignore if already collided
+    public boolean checkCollisionWithBall(Ball ball) {
+        if (ball.hasCollided()) return false; // Ignore if already collided
 
-    for (int i = segments.size() - 1; i >= 0; i--) {
-        PVector p1 = segments.get(i);
-        PVector p2 = (i == segments.size() - 1) ? segments.get(i) : segments.get(i + 1);
-        
-        if (isCollidingWithSegment(ball, p1, p2)) {
-            System.out.println("Collision detected with segment: " + i);
-            reflectBall(ball, p1, p2);
-            ball.setHasCollided(true); // Set collision flag
-            return true; // Return true if collision occurs
+        for (int i = segments.size() - 1; i >= 0; i--) {
+            PVector p1 = segments.get(i);
+            PVector p2 = (i == segments.size() - 1) ? segments.get(i) : segments.get(i + 1);
+            
+            if (isCollidingWithSegment(ball, p1, p2)) {
+                System.out.println("Collision detected with segment: " + i);
+                reflectBall(ball, p1, p2);
+                ball.setHasCollided(true); // Set collision flag
+                return true; // Return true if collision occurs
+            }
         }
+        return false; // No collision
     }
-    return false; // No collision
-}
 
 
     private boolean isCollidingWithSegment(Ball ball, PVector p1, PVector p2) {
