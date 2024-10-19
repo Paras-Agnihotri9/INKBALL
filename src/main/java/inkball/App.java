@@ -182,7 +182,7 @@ public class App extends PApplet {
     }
 
     private boolean allBallsAbsorbed() {
-        return activeBalls.isEmpty();
+        return ballsToSpawn.isEmpty() && activeBalls.isEmpty();
     }
 
     private boolean timeReached() {
@@ -211,33 +211,31 @@ public class App extends PApplet {
         
     }
 
-    @Override
+@Override
     public void mousePressed(MouseEvent e) {
         if (mouseButton == PConstants.LEFT) { // Left mouse button
-            // Check if Ctrl key is pressed
             if (keyPressed && key == PConstants.CONTROL) {
                 // Ctrl + Left Click: Remove the line under the mouse
                 removeLineAtMouse();
             } else {
-                // Create a new player-drawn line with color black and thickness 10
+                // Start drawing a new line
                 currentLine = new PlayerLine(Color.BLACK, 10);
-                // Add the initial point to the line
-                currentLine.addSegment(mouseX, mouseY);
+                currentLine.addSegment(mouseX, mouseY); // Initial point
             }
-        if(mouseButton == PConstants.RIGHT){
+        } else if (mouseButton == PConstants.RIGHT) {
+            // Right click: Remove the line under the mouse
             removeLineAtMouse();
-        }
         }
     }
 
     @Override
     public void mouseDragged(MouseEvent e) {
         if (mouseButton == PConstants.LEFT && currentLine != null) {
-            // Add line segments as the mouse is dragged
+            // Add segments as the mouse is dragged
             currentLine.addSegment(mouseX, mouseY);
         }
 
-        // Right mouse button or Ctrl + Left click for removing lines
+        // Handle right click or Ctrl+Left click for line removal while dragging
         if (mouseButton == PConstants.RIGHT || (mouseButton == PConstants.LEFT && keyPressed && key == PConstants.CONTROL)) {
             removeLineAtMouse();
         }
@@ -246,7 +244,7 @@ public class App extends PApplet {
     @Override
     public void mouseReleased(MouseEvent e) {
         if (mouseButton == PConstants.LEFT && currentLine != null) {
-            // Mark the line as complete once the mouse is released
+            // Mark the line as complete and add to the list of player-drawn lines
             currentLine.setComplete(true);
             playerLines.add(currentLine);
             currentLine = null;
@@ -475,7 +473,7 @@ public class App extends PApplet {
 }
 
     public void spawnBallFromSpawner(String ballId) {
-        if (spawners.isEmpty()) return; // No spawners found
+    if (spawners.isEmpty()) return; // No spawners found
 
         // Randomly select a spawner
         int[] spawnerPos = spawners.get(random.nextInt(spawners.size()));
@@ -483,7 +481,6 @@ public class App extends PApplet {
         int y = spawnerPos[1] * CELLHEIGHT;
         Ball newBall = new Ball(x, y, ballId, balls); // Pass the balls array
         activeBalls.add(newBall);
-        //System.out.println("Spawned ball at: (" + x + ", " + y + ") with color: " + ballId);
     }
 
     public void spawnBallFromBoard(String ballId, int xCor, int yCor){
@@ -501,70 +498,92 @@ public class App extends PApplet {
         }
     }
 
-    public void spawnIntervalCounterModifier(){
+    public void spawnIntervalCounterModifier() {
+    // Count down the spawn interval
         if (spawnIntervalCounter > 0) {
-                spawnIntervalCounter--;
-            } else if (!ballsToSpawn.isEmpty()) {
-                // Spawn next ball
-                String nextBall = ballsToSpawn.remove(0); // Get the next ball
-                spawnBallFromSpawner(nextBall);
-                
-                // Reset the interval counter
-                spawnIntervalCounter = spawnInterval * FPS;
-            }
+            spawnIntervalCounter--;
+        } else if (!ballsToSpawn.isEmpty()) {
+            // Spawn the next ball after the interval elapses
+            String nextBall = ballsToSpawn.remove(0); // Get the next ball
+            spawnBallFromSpawner(nextBall);
+            
+            // Reset the interval counter
+            spawnIntervalCounter = spawnInterval * FPS;
+        }
     }
 
+
     private void BallMovement() {
+        // Temporary list to store lines and balls to be removed after the loops
+        List<PlayerLine> linesToRemove = new ArrayList<>();
+        List<Ball> ballsToRemove = new ArrayList<>(); // List to keep track of balls that need to be removed
+
         for (Ball ball : activeBalls) {
             ball.update();
             ball.display(this); // Render the ball
             ball.resetCollision();
 
+            // Handle wall and hole collisions
             for (Wall wall : wallsList) {
-                wall.handleCollision(ball); // Handle wall collisions
+                wall.handleCollision(ball);
             }
 
             for (Hole hole : holesList) {
                 ball.attractToHole(hole); // Check attraction for each ball
+                if (ball.captured) {
+                    if (ball.isCaptureSuccessfulFlag) {
+                        ballsToRemove.add(ball); // Mark ball for removal if captured successfully
+                    } else {
+                        ballsToSpawn.add(ball.getBallId()); // Add back to spawn if absorption failed
+                    }
+                }
             }
 
-            // Iterate over lines and check for collisions, but only if the line is complete
-            Iterator<PlayerLine> lineIterator = playerLines.iterator();
-            while (lineIterator.hasNext()) {
-                PlayerLine line = lineIterator.next();
+            // Check for player line collisions
+            for (PlayerLine line : playerLines) {
                 if (line.isComplete()) {
                     line.checkCollisionWithBall(ball);
                     if (ball.hasCollided()) {
-                        lineIterator.remove(); // Remove the line if there's a collision
+                        linesToRemove.add(line); // Mark the line for removal if collided
                     }
                 }
             }
         }
-        
+
+        // Remove absorbed balls and lines
+        activeBalls.removeAll(ballsToRemove);
+        playerLines.removeAll(linesToRemove);
+
+        // Do not handle spawning here anymore; rely on spawnIntervalCounterModifier to handle spawning
     }
 
 
-    public void displayLine(){
-        for (PlayerLine line : playerLines) {
-                line.display(this);
+        public void displayLine(){
+            for (PlayerLine line : playerLines) {
+            line.display(this); // Display each complete line
             }
-    }
-    public void removeLine(PlayerLine line) {
-        playerLines.remove(line);
-    }
+        // If there's a line being drawn (currentLine), render it as well
+            if (currentLine != null) {
+                currentLine.display(this); // Display the current line being drawn
+            }
+        }
 
-    public void checkBallCollisions() {
-    // Iterate over active balls and check for collisions with each line
-    for (Ball ball : activeBalls) {
-        // Iterate over lines and check for collisions
-        for (int i = playerLines.size() - 1; i >= 0; i--) {
-            PlayerLine line = playerLines.get(i);
-            if (line.checkCollisionWithBall(ball)) {
-                playerLines.remove(i); // Remove the line if a collision occurred
+        public void removeLine(PlayerLine line) {
+            playerLines.remove(line);
+        }
+
+        public void checkBallCollisions() {
+        // Iterate over active balls and check for collisions with each line
+        for (Ball ball : activeBalls) {
+            // Iterate over lines and check for collisions
+            for (int i = playerLines.size() - 1; i >= 0; i--) {
+                PlayerLine line = playerLines.get(i);
+                if (line.checkCollisionWithBall(ball)) {
+                    playerLines.remove(i); // Remove the line if a collision occurred
+                }
             }
         }
     }
-}
 
     public static void main(String[] args) {
         PApplet.main("inkball.App");

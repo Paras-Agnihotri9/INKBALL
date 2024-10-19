@@ -40,6 +40,9 @@ public class Ball {
         this.captured = false;
         this.currentSize = originalSize; // Start at the original size
     }
+    public String getBallId(){
+        return color;
+    }
 
     public void update( ) {
         if (!captured) {
