@@ -22,6 +22,7 @@ public class Ball {
     private boolean hasCollided;
     public boolean captured;
     private boolean scoreUpdated = false; // New flag to check if score is already updated
+    public boolean added = false;
     public static boolean isCaptureSuccessfulFlag = false;
 
     // Variables for shrinking animation
@@ -218,7 +219,6 @@ public class Ball {
             if (captured == true) {
                 String holeType = String.valueOf(hole.type); // Get hole type as a String
                 isCaptureSuccessfulFlag = isCaptureSuccessful(holeType);
-
                 // Update score based on capture success
                 updateScore(isCaptureSuccessfulFlag, holeType);
                 

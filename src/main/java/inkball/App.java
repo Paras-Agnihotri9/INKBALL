@@ -47,7 +47,7 @@ public class App extends PApplet {
     private ArrayList<PlayerLine> playerLines; // All player-drawn lines
 
     //List<Hole> holesList; // List to hold holes
-
+    public boolean levelCompleted = false;
     List<int[]> spawners;
 
     int time;
@@ -63,6 +63,15 @@ public class App extends PApplet {
     int startTime;
     int currentLevelIndex = 0;
 
+   
+    int maxDisplayBalls = 5; // Max balls to display at once
+    float[] ballXPositions = new float[maxDisplayBalls]; // Array to store X positions of each ball
+    List<String> upcomingBalls; // List of upcoming balls
+    int nextBallIndex = 0; // Index to track the next ball to spawn
+    boolean shouldAnimate = false; // Flag to trigger sliding animation
+    int numDisplayedBalls = 0; // Number of balls currently displayed
+    double slidingSpeed = 0.5; // Speed of the sliding animation
+    int ballDisplaySize = 32; // Size of the ball images
 	// Feel free to add any additional methods or attributes you want. Please put classes in different files.
 
     public App() {
@@ -89,7 +98,7 @@ public class App extends PApplet {
     public PImage[] holes;
     boolean[][] occupied;
     boolean [][] occupiedBall;
-
+    int type;
 
     private void initializeBallColorMap() {
         ballColorMap = new HashMap<>();
@@ -115,11 +124,17 @@ public class App extends PApplet {
         occupiedBall = new boolean[BOARD_WIDTH][BOARD_HEIGHT];
         playerLines = new ArrayList<>();
         holesList = new ArrayList<>();
-        //System.out.println("Balls to spawn: " + ballsToSpawn);
+        upcomingBalls = new ArrayList<>();
+        ballXPositions = new float[maxDisplayBalls];
+    
+    // Initialize ball positions to slide from the right
+    for (int i = 0; i < maxDisplayBalls; i++) {
+        ballXPositions[i] = i * (ballDisplaySize + 10); // Space between balls
+    }
 
          // Balls from config file
         int spawnIntervalCounter = spawnInterval * FPS;
-
+        upcomingBalls = new ArrayList<>();
         activeBalls = new ArrayList<>();
         wallsList = new ArrayList<>();
 
@@ -141,6 +156,10 @@ public class App extends PApplet {
             holes[i] = loadImage("src/main/resources/inkball/hole" + i + ".png");
         }
 
+        for (int i = 0; i < maxDisplayBalls; i++) {
+            ballXPositions[i] = i * (ballDisplaySize + 10); // Space between balls
+        }
+
         // Load other images
         tile = loadImage("src/main/resources/inkball/tile.png");
         spawner = loadImage("src/main/resources/inkball/entrypoint.png");
@@ -153,12 +172,19 @@ public class App extends PApplet {
         }
 
         setupLevel(currentLevelIndex);
+        initializeBallPositions();
         }
 
     /**
      * Receive key pressed signal from the keyboard.
      */
     private void setupLevel(int levelIndex) {
+        // Call restartLevel to reset everything except the score
+        if (levelCompleted == true){
+            restartLevel();
+        }
+
+        // Now initialize the new level based on the levelIndex
         GameConfig gameConfig = new GameConfig(this, "config.json");
         this.time = gameConfig.getTime(levelIndex);
         this.spawnInterval = gameConfig.getSpawnInterval(levelIndex);
@@ -166,19 +192,46 @@ public class App extends PApplet {
         this.ballsToSpawn = gameConfig.getBalls(levelIndex);
         this.scoreIncreaseModifier = gameConfig.getScoreIncreaseModifier(levelIndex);
         this.scoreDecreaseModifier = gameConfig.getScoreDecreaseModifier(levelIndex);
+        
+        // Reset the spawn interval counter for this new level
         this.spawnIntervalCounter = this.spawnInterval * FPS;
-        // Load the level layout
+
+        // Load the new level layout
         loadLevel(layout);
+    }
+
+    public void initializeBallPositions() {
+        for (int i = 0; i < maxDisplayBalls; i++) {
+            ballXPositions[i] = i * (ballDisplaySize + 10); // Initial positions of the balls
+        }
     }
 
     private void checkLevelCompletion() {
         if (allBallsAbsorbed()) {
             currentLevelIndex++; // Move to the next level
+            levelCompleted = true;
             setupLevel(currentLevelIndex);
         } else if (timeReached()) {
             // Stop displaying timer and score
             displayGameEndMessage();
         }
+    }
+
+    private void restartLevel() {
+        // Clear all game objects and reset variables, except for the score
+        playerLines.clear();
+        holesList.clear();
+        wallsList.clear();
+        activeBalls.clear();
+        ballsToSpawn.clear();
+
+        // Reset flags and counters
+        spawnIntervalCounter = spawnInterval * FPS;
+        levelCompleted = false; // Reset level completed flag
+        startTime = millis(); // Reset the level start time
+
+        // Reset other necessary flags or objects
+        resetOccupied();
     }
 
     private boolean allBallsAbsorbed() {
@@ -269,6 +322,8 @@ public class App extends PApplet {
 	@Override
     public void draw() {
         background(255);
+        updateUpcomingBalls(); // Update the ball queue and handle the sliding effect
+        displayUpcomingBalls(); // Show the upcoming balls with the sliding effect
        //String filepath = 
 
         //----------------------------------
@@ -288,6 +343,7 @@ public class App extends PApplet {
         
         //----------------------------------
         //display score
+    
         //----------------------------------
         //TODO
         text("Score: " + score, WIDTH - 150, 40); 
@@ -363,6 +419,116 @@ public class App extends PApplet {
         text("Time: " + timeString, WIDTH - 150, TOPBAR / 2 + 25); // Adjust the position as needed
     }
 
+   
+// Function to handle sliding and popping logic
+public void updateUpcomingBalls() {
+    // Only proceed if there are balls to animate and the animation flag is true
+    if (shouldAnimate && !ballsToSpawn.isEmpty()) {
+        // If the first ball has fully slid off-screen, handle its removal
+        if (ballXPositions[0] <= -ballDisplaySize) {
+            // Move the first ball into the game (effectively removing it)
+            nextBallIndex = (nextBallIndex + 1) % ballsToSpawn.size();
+
+            // Shift remaining balls' positions left
+            for (int i = 1; i < numDisplayedBalls; i++) {
+                ballXPositions[i - 1] = ballXPositions[i]; // Move the next ball into the previous one's position
+            }
+
+            // Set the last ball's position for sliding in from the right
+            if (numDisplayedBalls < maxDisplayBalls && ballsToSpawn.size() > numDisplayedBalls) {
+                ballXPositions[numDisplayedBalls] = maxDisplayBalls * (ballDisplaySize + 10);
+                numDisplayedBalls++;
+            }
+
+            // Stop the animation after the shift is complete
+            shouldAnimate = false;
+        }
+    }
+}
+
+// Function to trigger ball list changes and start the animation
+// Function to trigger ball list changes and start the animation
+// Function to trigger ball list changes and start the animation
+public void onBallListChange() {
+    // Check how many balls should be displayed
+    int numberOfBallsToShow = Math.min(ballsToSpawn.size(), maxDisplayBalls);
+
+    // If the ball list changes (a ball is added or removed), start the animation
+    if (!ballsToSpawn.isEmpty()) {
+        shouldAnimate = true;  // Start the sliding animation
+
+        // Set up initial X positions for sliding animation
+        for (int i = 0; i < numberOfBallsToShow; i++) {
+            ballXPositions[i] = i * (ballDisplaySize + 10); // Space balls evenly
+        }
+
+        // Handle adding a new ball (when the number of balls exceeds displayed ones)
+        if (ballsToSpawn.size() > numberOfBallsToShow && numberOfBallsToShow < maxDisplayBalls) {
+            // New ball should slide in from the right
+            ballXPositions[numberOfBallsToShow] = maxDisplayBalls * (ballDisplaySize + 10); // Off-screen
+        }
+
+        numDisplayedBalls = numberOfBallsToShow; // Update the number of displayed balls
+    }
+}
+
+// Function to display upcoming balls
+// Function to display upcoming balls
+public void displayUpcomingBalls() {
+    // Draw black background for the upcoming balls area
+    fill(0);
+    rect(0, 0, (maxDisplayBalls + 1) * ballDisplaySize, ballDisplaySize + 20);
+
+    // Calculate the number of balls to display
+    numDisplayedBalls = Math.min(maxDisplayBalls, ballsToSpawn.size());
+
+    // Display and animate the upcoming balls
+    for (int i = 0; i < numDisplayedBalls; i++) {
+        // Get the ball ID from ballsToSpawn based on the nextBallIndex
+        int currentBallIndex = (nextBallIndex + i) % ballsToSpawn.size();
+        String ballId = ballsToSpawn.get(currentBallIndex);
+
+        // Map ball ID to its type (0: grey, 1: orange, 2: blue, 3: green, 4: yellow)
+        int type = getBallType(ballId);
+
+        // Draw the ball at its current position from ballXPositions array
+        image(balls[type], ballXPositions[i], 10, ballDisplaySize, ballDisplaySize);
+
+        // Animate the balls sliding to the left when a ball is removed
+        if (shouldAnimate && ballXPositions[i] > i * (ballDisplaySize + 10)) {
+            ballXPositions[i] -= slidingSpeed; // Slide left until it reaches the correct position
+        }
+    }
+
+    // Check if the animation is complete (all balls have reached their positions)
+    boolean animationComplete = true;
+    for (int i = 0; i < numDisplayedBalls; i++) {
+        if (ballXPositions[i] > i * (ballDisplaySize + 10)) {
+            animationComplete = false;
+            break;
+        }
+    }
+
+    // Stop the animation once all balls are in place
+    if (animationComplete) {
+        shouldAnimate = false;
+    }
+}
+
+    // Helper function to get ball type based on its ID
+    private int getBallType(String ballId) {
+        switch (ballId) {
+            case "grey": return 0;
+            case "orange": return 1;
+            case "blue": return 2;
+            case "green": return 3;
+            case "yellow": return 4;
+            default: return 0; // Default to grey if unrecognized
+        }
+    }
+
+
+
     private void drawBoard() {
     for (int y = 2; y < BOARD_HEIGHT; y++) {
         for (int x = 0; x < BOARD_WIDTH; x++) {
@@ -437,7 +603,6 @@ public class App extends PApplet {
                         if(occupiedBall[x][y]){
                             image(tile, x * CELLSIZE, y * CELLHEIGHT);
                         }
-                        //println(ballColor);
                     }
                     break;
                 case 'H':
@@ -488,6 +653,7 @@ public class App extends PApplet {
         yCor = yCor * CELLHEIGHT;
         Ball newBall = new Ball(xCor, yCor, ballId, balls);
         activeBalls.add(newBall);
+        println("Spawning ball of type " + ballId + " at " + xCor + ", " + yCor);
     }
 
     private void resetOccupied() {
@@ -499,18 +665,25 @@ public class App extends PApplet {
     }
 
     public void spawnIntervalCounterModifier() {
-    // Count down the spawn interval
+        // Count down the spawn interval
         if (spawnIntervalCounter > 0) {
             spawnIntervalCounter--;
         } else if (!ballsToSpawn.isEmpty()) {
             // Spawn the next ball after the interval elapses
             String nextBall = ballsToSpawn.remove(0); // Get the next ball
+            onBallListChange();
             spawnBallFromSpawner(nextBall);
             
             // Reset the interval counter
             spawnIntervalCounter = spawnInterval * FPS;
         }
+
+        // Check if all balls are spawned and captured
+        if (ballsToSpawn.isEmpty() && activeBalls.isEmpty()) {
+            checkLevelCompletion();  // Ensure that this is only called when all balls are done
+        }
     }
+
 
 
     private void BallMovement() {
@@ -522,7 +695,7 @@ public class App extends PApplet {
             ball.update();
             ball.display(this); // Render the ball
             ball.resetCollision();
-
+            System.out.println(ballsToSpawn);
             // Handle wall and hole collisions
             for (Wall wall : wallsList) {
                 wall.handleCollision(ball);
@@ -533,8 +706,10 @@ public class App extends PApplet {
                 if (ball.captured) {
                     if (ball.isCaptureSuccessfulFlag) {
                         ballsToRemove.add(ball); // Mark ball for removal if captured successfully
-                    } else {
+                    } else if(!ball.isCaptureSuccessfulFlag && !ball.added){
                         ballsToSpawn.add(ball.getBallId()); // Add back to spawn if absorption failed
+                        onBallListChange();
+                        ball.added = true;
                     }
                 }
             }
@@ -556,23 +731,23 @@ public class App extends PApplet {
 
         // Do not handle spawning here anymore; rely on spawnIntervalCounterModifier to handle spawning
     }
+    
 
-
-        public void displayLine(){
-            for (PlayerLine line : playerLines) {
-            line.display(this); // Display each complete line
-            }
-        // If there's a line being drawn (currentLine), render it as well
-            if (currentLine != null) {
-                currentLine.display(this); // Display the current line being drawn
-            }
+    public void displayLine(){
+        for (PlayerLine line : playerLines) {
+        line.display(this); // Display each complete line
         }
-
-        public void removeLine(PlayerLine line) {
-            playerLines.remove(line);
+    // If there's a line being drawn (currentLine), render it as well
+        if (currentLine != null) {
+            currentLine.display(this); // Display the current line being drawn
         }
+    }
 
-        public void checkBallCollisions() {
+    public void removeLine(PlayerLine line) {
+        playerLines.remove(line);
+    }
+
+    public void checkBallCollisions() {
         // Iterate over active balls and check for collisions with each line
         for (Ball ball : activeBalls) {
             // Iterate over lines and check for collisions
