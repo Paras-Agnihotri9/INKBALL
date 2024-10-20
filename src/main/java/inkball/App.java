@@ -28,7 +28,7 @@ public class App extends PApplet {
     public static int HEIGHT = 640; //BOARD_HEIGHT*CELLSIZE+TOPBAR;
     public static final int BOARD_WIDTH = WIDTH/CELLSIZE;
     public static final int BOARD_HEIGHT = 20;
-    public static int score = 0;
+    public static float score = 0;
 
     public static final int INITIAL_PARACHUTES = 1;
 
@@ -46,6 +46,8 @@ public class App extends PApplet {
 
     private ArrayList<PlayerLine> playerLines; // All player-drawn lines
 
+    private boolean isEnded = false;
+
     //List<Hole> holesList; // List to hold holes
     public boolean levelCompleted = false;
     List<int[]> spawners;
@@ -61,8 +63,8 @@ public class App extends PApplet {
     List<Wall> wallsList;
     List<Hole> holesList;
     int startTime;
-    int currentLevelIndex = 0;
-
+    public static int currentLevelIndex = 0;
+    boolean isPaused = false;  // Flag to track whether the game is paused
    
     int maxDisplayBalls = 5; // Max balls to display at once
     float[] ballXPositions = new float[maxDisplayBalls]; // Array to store X positions of each ball
@@ -126,12 +128,6 @@ public class App extends PApplet {
         holesList = new ArrayList<>();
         upcomingBalls = new ArrayList<>();
         ballXPositions = new float[maxDisplayBalls];
-    
-    // Initialize ball positions to slide from the right
-    for (int i = 0; i < maxDisplayBalls; i++) {
-        ballXPositions[i] = i * (ballDisplaySize + 10); // Space between balls
-    }
-
          // Balls from config file
         int spawnIntervalCounter = spawnInterval * FPS;
         upcomingBalls = new ArrayList<>();
@@ -170,8 +166,15 @@ public class App extends PApplet {
         } else {
             println("Board loaded successfully");
         }
-
+        
         setupLevel(currentLevelIndex);
+
+        for (int i = 0; i < Math.min(maxDisplayBalls, ballsToSpawn.size()); i++) {
+            ballXPositions[i] = i * (ballDisplaySize + 10);  // Position balls at the start
+        }
+
+        numDisplayedBalls = Math.min(maxDisplayBalls, ballsToSpawn.size());
+
         initializeBallPositions();
         }
 
@@ -213,7 +216,7 @@ public class App extends PApplet {
             setupLevel(currentLevelIndex);
         } else if (timeReached()) {
             // Stop displaying timer and score
-            displayGameEndMessage();
+            isEnded = true;
         }
     }
 
@@ -253,12 +256,49 @@ public class App extends PApplet {
 
 	@Override
     public void keyPressed(KeyEvent event){
-        
+        if (key == 'r' || key == 'R') {
+            restartLevelR();
+        }
+        if (key == ' ') {
+            togglePause();
+        }
     }
 
-    /**
+    public void restartLevelR() {
+        // Reset timer
+
+        // Reset balls and other game objects
+        ballsToSpawn.clear();  // Clear the ball list
+        activeBalls.clear();   // Clear active balls
+        playerLines.clear();   // Clear player-drawn lines
+
+        // Reset the score to the pre-level state (assuming you store it)
+        score = 0;
+        startTime = millis();
+        // Reinitialize the level to its initial state
+        setupLevel(currentLevelIndex);
+
+        // Reset the ball positions for upcoming balls
+        initializeBallPositions();
+
+        println("Level restarted!");
+    }
+
+    public void togglePause() {
+        isPaused = !isPaused;  // Toggle the pause state
+
+        // Print the pause status for debugging
+        if (isPaused) {
+            println("Game Paused");
+        } else {
+            println("Game Unpaused");
+        }
+    }
+
+        /**
      * Receive key released signal from the keyboard.
      */
+    
 	@Override
     public void keyReleased(){
         
@@ -333,20 +373,42 @@ public class App extends PApplet {
         resetOccupied();
         drawBoard();
         spawnIntervalCounterModifier();
-        BallMovement();
-        displayLine();
-        
+        if(!isPaused && !isEnded){
+            BallMovement();
+        }
+        if(!isEnded){
+            displayLine();
+            textSize(20);
+            text("Score: " + score, WIDTH - 150, 40); 
+            displayTime();
+        }
+ 
         checkLevelCompletion();
          
 
         
-        
+        if (isPaused) {
+            fill(0); 
+            textAlign(CENTER);
+            textSize(20);
+            text("*** PAUSED ***", width / 2, 30);  // Display "PAUSED" at the top
+            for (Ball ball : activeBalls) {
+                ball.display(this);
+            }
+        }
+
+        if(isEnded){
+            fill(0); 
+            textAlign(CENTER);
+            textSize(20);
+            text(" === TIME’S UP === ", width / 2, 30);  // Display "PAUSED" at the top
+        }
         //----------------------------------
         //display score
     
         //----------------------------------
         //TODO
-        text("Score: " + score, WIDTH - 150, 40); 
+        
         
         //----------------------------------
         //display time
@@ -357,7 +419,7 @@ public class App extends PApplet {
         //----------------------------------
 		//display game end message
 
-        displayTime();
+       
 
     }
 
@@ -415,63 +477,102 @@ public class App extends PApplet {
         String timeString = String.valueOf(elapsedTime); // Convert to String
 
         // Display the time on the right side of the top bar
+        textSize(20);
         fill(0);
-        text("Time: " + timeString, WIDTH - 150, TOPBAR / 2 + 25); // Adjust the position as needed
+        text("Time: " + timeString, WIDTH - 150, TOPBAR / 2 + 15); // Adjust the position as needed
     }
 
    
-// Function to handle sliding and popping logic
+// Function to handle ball sliding animation when balls are added or removed
+// Function to handle ball sliding animation when balls are added or removed
+// Function to handle ball sliding animation when balls are added or removed
 public void updateUpcomingBalls() {
-    // Only proceed if there are balls to animate and the animation flag is true
-    if (shouldAnimate && !ballsToSpawn.isEmpty()) {
-        // If the first ball has fully slid off-screen, handle its removal
+    // Only animate if there are balls to slide and the animation is triggered
+    if (!ballsToSpawn.isEmpty() && shouldAnimate) {
+        // Slide all balls to their target positions
+        for (int i = 0; i < numDisplayedBalls; i++) {
+            float targetX = i * (ballDisplaySize + 10);  // Target position for each ball
+
+            // If the current ball hasn't reached its target position, keep sliding
+            if (ballXPositions[i] > targetX) {
+                ballXPositions[i] -= slidingSpeed;  // Slide left by a small amount
+                if (ballXPositions[i] < targetX) {
+                    ballXPositions[i] = targetX;  // Correct overshoot
+                }
+            }
+        }
+
+        // If the first ball has slid off-screen, remove it and adjust the array
         if (ballXPositions[0] <= -ballDisplaySize) {
-            // Move the first ball into the game (effectively removing it)
-            nextBallIndex = (nextBallIndex + 1) % ballsToSpawn.size();
+            // Remove the first ball from the spawn list
+            ballsToSpawn.remove(0);
 
             // Shift remaining balls' positions left
             for (int i = 1; i < numDisplayedBalls; i++) {
-                ballXPositions[i - 1] = ballXPositions[i]; // Move the next ball into the previous one's position
+                ballXPositions[i - 1] = ballXPositions[i];
             }
 
-            // Set the last ball's position for sliding in from the right
-            if (numDisplayedBalls < maxDisplayBalls && ballsToSpawn.size() > numDisplayedBalls) {
-                ballXPositions[numDisplayedBalls] = maxDisplayBalls * (ballDisplaySize + 10);
-                numDisplayedBalls++;
+            // Set the last ball to slide in from the right
+            if (ballsToSpawn.size() >= numDisplayedBalls) {
+                ballXPositions[numDisplayedBalls - 1] = maxDisplayBalls * (ballDisplaySize + 10);  // Offscreen on the right
             }
 
-            // Stop the animation after the shift is complete
-            shouldAnimate = false;
+            // Update the number of displayed balls
+            numDisplayedBalls = Math.min(ballsToSpawn.size(), maxDisplayBalls);
         }
     }
+
+    // Keep animating if any ball is still sliding
+    boolean slidingInProgress = false;
+    for (int i = 0; i < numDisplayedBalls; i++) {
+        float targetX = i * (ballDisplaySize + 10);
+        if (ballXPositions[i] > targetX) {
+            slidingInProgress = true;
+        }
+    }
+
+    // Stop animation only if no ball is moving anymore
+    shouldAnimate = slidingInProgress;
 }
 
-// Function to trigger ball list changes and start the animation
-// Function to trigger ball list changes and start the animation
+
 // Function to trigger ball list changes and start the animation
 public void onBallListChange() {
-    // Check how many balls should be displayed
+    // Ensure there are balls in the list before proceeding
+    if (ballsToSpawn.isEmpty()) {
+        return;  // Exit early if there are no balls to animate
+    }
+
+    // Check the number of balls to display, capped at maxDisplayBalls
     int numberOfBallsToShow = Math.min(ballsToSpawn.size(), maxDisplayBalls);
 
-    // If the ball list changes (a ball is added or removed), start the animation
-    if (!ballsToSpawn.isEmpty()) {
-        shouldAnimate = true;  // Start the sliding animation
+    // Only trigger animation when the list size changes
+    if (ballsToSpawn.size() != numDisplayedBalls) {
+        shouldAnimate = true;  // Trigger animation
 
-        // Set up initial X positions for sliding animation
+        // Set initial positions for all balls (evenly spaced)
         for (int i = 0; i < numberOfBallsToShow; i++) {
-            ballXPositions[i] = i * (ballDisplaySize + 10); // Space balls evenly
+            ballXPositions[i] = i * (ballDisplaySize + 10);  // Correct positions
         }
 
-        // Handle adding a new ball (when the number of balls exceeds displayed ones)
-        if (ballsToSpawn.size() > numberOfBallsToShow && numberOfBallsToShow < maxDisplayBalls) {
-            // New ball should slide in from the right
-            ballXPositions[numberOfBallsToShow] = maxDisplayBalls * (ballDisplaySize + 10); // Off-screen
+        // Handle the new ball sliding in from the right
+        if (ballsToSpawn.size() > numberOfBallsToShow) {
+            // Ensure we don't exceed the bounds of ballXPositions array
+            if (numberOfBallsToShow < maxDisplayBalls) {
+                ballXPositions[numberOfBallsToShow] = maxDisplayBalls * (ballDisplaySize + 10);  // Start new ball off-screen
+            }
         }
 
-        numDisplayedBalls = numberOfBallsToShow; // Update the number of displayed balls
+        numDisplayedBalls = numberOfBallsToShow;  // Update displayed ball count
     }
 }
 
+
+
+// Function to display upcoming balls
+// Function to display upcoming balls
+// Function to display upcoming balls
+// Function to display upcoming balls
 // Function to display upcoming balls
 // Function to display upcoming balls
 public void displayUpcomingBalls() {
@@ -479,41 +580,22 @@ public void displayUpcomingBalls() {
     fill(0);
     rect(0, 0, (maxDisplayBalls + 1) * ballDisplaySize, ballDisplaySize + 20);
 
-    // Calculate the number of balls to display
-    numDisplayedBalls = Math.min(maxDisplayBalls, ballsToSpawn.size());
-
-    // Display and animate the upcoming balls
+    // Display the upcoming balls
     for (int i = 0; i < numDisplayedBalls; i++) {
-        // Get the ball ID from ballsToSpawn based on the nextBallIndex
-        int currentBallIndex = (nextBallIndex + i) % ballsToSpawn.size();
-        String ballId = ballsToSpawn.get(currentBallIndex);
+        // Get the ball ID from ballsToSpawn safely
+        if (i >= ballsToSpawn.size()) {
+            continue;  // Avoid out of bounds access
+        }
+        String ballId = ballsToSpawn.get(i);
 
         // Map ball ID to its type (0: grey, 1: orange, 2: blue, 3: green, 4: yellow)
         int type = getBallType(ballId);
 
         // Draw the ball at its current position from ballXPositions array
         image(balls[type], ballXPositions[i], 10, ballDisplaySize, ballDisplaySize);
-
-        // Animate the balls sliding to the left when a ball is removed
-        if (shouldAnimate && ballXPositions[i] > i * (ballDisplaySize + 10)) {
-            ballXPositions[i] -= slidingSpeed; // Slide left until it reaches the correct position
-        }
-    }
-
-    // Check if the animation is complete (all balls have reached their positions)
-    boolean animationComplete = true;
-    for (int i = 0; i < numDisplayedBalls; i++) {
-        if (ballXPositions[i] > i * (ballDisplaySize + 10)) {
-            animationComplete = false;
-            break;
-        }
-    }
-
-    // Stop the animation once all balls are in place
-    if (animationComplete) {
-        shouldAnimate = false;
     }
 }
+
 
     // Helper function to get ball type based on its ID
     private int getBallType(String ballId) {

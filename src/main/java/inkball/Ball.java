@@ -251,7 +251,7 @@ public class Ball {
         System.out.println("Capture Successful: " + isCaptureSuccessful + ", Hole Type: " + holeType);
         if (isCaptureSuccessful) {
             // Successful capture
-            float scoreIncrease = App.scoreIncreaseModifier * 3;
+            float scoreIncrease = App.scoreIncreaseModifier * (App.currentLevelIndex+1);
             App.score += scoreIncrease; // Increase score
             System.out.println("Score increased by: " + scoreIncrease + ", New Score: " + App.score);
         } else {
