@@ -1,0 +1,269 @@
+<?xml version="1.0" encoding="UTF-8"?><!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd"><html xmlns="http://www.w3.org/1999/xhtml" lang="en"><head><meta http-equiv="Content-Type" content="text/html;charset=UTF-8"/><link rel="stylesheet" href="../jacoco-resources/report.css" type="text/css"/><link rel="shortcut icon" href="../jacoco-resources/report.gif" type="image/gif"/><title>Ball.java</title><link rel="stylesheet" href="../jacoco-resources/prettify.css" type="text/css"/><script type="text/javascript" src="../jacoco-resources/prettify.js"></script></head><body onload="window['PR_TAB_WIDTH']=4;prettyPrint()"><div class="breadcrumb" id="breadcrumb"><span class="info"><a href="../jacoco-sessions.html" class="el_session">Sessions</a></span><a href="../index.html" class="el_report">INKBALL</a> &gt; <a href="index.source.html" class="el_package">inkball</a> &gt; <span class="el_source">Ball.java</span></div><h1>Ball.java</h1><pre class="source lang-java linenums">package inkball;
+
+import processing.core.PApplet;
+import processing.core.PImage;
+import processing.core.PVector;
+
+
+import java.util.Random;
+
+public class Ball {
+<span class="nc" id="L11">    private static final Random random = new Random();</span>
+<span class="nc" id="L12">    private static final int VELOCITY_OPTIONS[] = {-2, 2};</span>
+
+    private float x; // X position of the ball
+    private float y; // Y position of the ball
+    private String color; // Color of the ball based on its ID
+    public float velocityX; // Velocity in the x direction
+    public float velocityY; // Velocity in the y direction
+    private PImage[] balls; // Reference to ball images
+<span class="nc" id="L20">    private int originalSize = 24; // Original size of the ball (width and height of the image)</span>
+    private float currentSize; // Current size of the ball for scaling
+    private boolean hasCollided;
+    public boolean captured;
+<span class="nc" id="L24">    private boolean scoreUpdated = false; // New flag to check if score is already updated</span>
+<span class="nc" id="L25">    public boolean added = false;</span>
+<span class="nc" id="L26">    public static boolean isCaptureSuccessfulFlag = false;</span>
+
+    // Variables for shrinking animation
+<span class="nc" id="L29">    public boolean shrinking = false;</span>
+<span class="nc" id="L30">    private float targetSize = 12; // Target smaller size for shrinking</span>
+<span class="nc" id="L31">    private float shrinkRate = 0.5f; // Rate at which the ball will shrink</span>
+
+<span class="nc" id="L33">    public Ball(float x, float y, String ballColor, PImage[] balls) {</span>
+<span class="nc" id="L34">        this.x = x;</span>
+<span class="nc" id="L35">        this.y = y;</span>
+<span class="nc" id="L36">        this.color = ballColor;</span>
+<span class="nc" id="L37">        this.balls = balls; // Store the reference</span>
+<span class="nc" id="L38">        this.velocityX = VELOCITY_OPTIONS[random.nextInt(2)];</span>
+<span class="nc" id="L39">        this.velocityY = VELOCITY_OPTIONS[random.nextInt(2)];</span>
+<span class="nc" id="L40">        this.hasCollided = false;</span>
+<span class="nc" id="L41">        this.captured = false;</span>
+<span class="nc" id="L42">        this.currentSize = originalSize; // Start at the original size</span>
+<span class="nc" id="L43">    }</span>
+    public String getBallId(){
+<span class="nc" id="L45">        return color;</span>
+    }
+
+    public void update( ) {
+            // Move the ball by velocity
+<span class="nc" id="L50">            x += velocityX;</span>
+<span class="nc" id="L51">            y += velocityY;</span>
+
+            // Handle shrinking if the shrinking flag is set
+<span class="nc bnc" id="L54" title="All 2 branches missed.">            if (shrinking) {</span>
+<span class="nc" id="L55">                currentSize -= shrinkRate; // Decrease size by shrinkRate</span>
+
+                // Ensure currentSize doesn't go below targetSize
+<span class="nc bnc" id="L58" title="All 2 branches missed.">                if (currentSize &lt;= targetSize) {</span>
+<span class="nc" id="L59">                    currentSize = targetSize; // Clamp the size</span>
+<span class="nc" id="L60">                    shrinking = false; // Stop shrinking</span>
+<span class="nc" id="L61">                    setCaptured(true); </span>
+                }
+            }
+
+            // Check attraction to holes
+<span class="nc" id="L66">        }</span>
+
+     public void display(PApplet app) {
+<span class="nc bnc" id="L69" title="All 2 branches missed.">        if (!captured) { // Only display if not captured</span>
+<span class="nc" id="L70">            int ballIndex = getColorIndex(color);</span>
+            // Display the ball image at the current size (scale the image)
+<span class="nc" id="L72">            app.image(balls[ballIndex], x, y, currentSize, currentSize);</span>
+        }
+<span class="nc" id="L74">    }</span>
+
+    private int getColorIndex(String color) {
+<span class="nc bnc" id="L77" title="All 6 branches missed.">        switch (color) {</span>
+            case &quot;grey&quot;:
+<span class="nc" id="L79">                return 0;</span>
+            case &quot;orange&quot;:
+<span class="nc" id="L81">                return 1;</span>
+            case &quot;blue&quot;:
+<span class="nc" id="L83">                return 2;</span>
+            case &quot;green&quot;:
+<span class="nc" id="L85">                return 3;</span>
+            case &quot;yellow&quot;:
+<span class="nc" id="L87">                return 4;</span>
+            default:
+<span class="nc" id="L89">                return 0; // Default to grey if not found</span>
+        }
+    }
+
+    public void startShrinking() {
+<span class="nc" id="L94">        targetSize = 12; // Set target size for shrinking</span>
+<span class="nc" id="L95">        shrinking = true; // Start the shrinking process</span>
+<span class="nc" id="L96">    }</span>
+
+
+    public float getX() {
+<span class="nc" id="L100">        return x;</span>
+    }
+
+    public float getY() {
+<span class="nc" id="L104">        return y;</span>
+    }
+
+    public float getVelocityX() {
+<span class="nc" id="L108">        return velocityX;</span>
+    }
+
+    public float getVelocityY() {
+<span class="nc" id="L112">        return velocityY;</span>
+    }
+
+    public void setVelocity(float newVelocityX, float newVelocityY) {
+<span class="nc" id="L116">        this.velocityX = newVelocityX;  // Update the actual velocity</span>
+<span class="nc" id="L117">        this.velocityY = newVelocityY;  // Update the actual velocity</span>
+<span class="nc" id="L118">        System.out.println(&quot;VelocityX&quot; + velocityX);</span>
+<span class="nc" id="L119">        System.out.println(&quot;VelocityY&quot; + velocityY);</span>
+<span class="nc" id="L120">    }</span>
+
+    public int getOriginalSize() {
+<span class="nc" id="L123">        return originalSize;</span>
+    }
+
+    public void reverseHorizontalDirection() {
+<span class="nc" id="L127">        velocityX *= -1;  // Reverse X velocity (horizontal direction)</span>
+<span class="nc" id="L128">    }</span>
+
+    public void reverseVerticalDirection() {
+<span class="nc" id="L131">        velocityY *= -1;  // Reverse Y velocity (vertical direction)</span>
+<span class="nc" id="L132">    }</span>
+
+    public void setColor(String new_color) {
+<span class="nc" id="L135">        color = new_color;</span>
+<span class="nc" id="L136">    }</span>
+
+    public void setX(float xCordinate) {
+<span class="nc" id="L139">        this.x = xCordinate;</span>
+<span class="nc" id="L140">    }</span>
+
+    public void setY(float yCordinate) {
+<span class="nc" id="L143">        this.y = yCordinate;</span>
+<span class="nc" id="L144">    }</span>
+
+    public void resetCollision() {
+<span class="nc" id="L147">        hasCollided = false; // Reset for the next frame</span>
+<span class="nc" id="L148">    }</span>
+
+    public boolean hasCollided() {
+<span class="nc" id="L151">        return hasCollided; // Getter for collision status</span>
+    }
+
+    public void setHasCollided(boolean hasCollided) {
+<span class="nc" id="L155">        this.hasCollided = hasCollided; // Setter for collision status</span>
+<span class="nc" id="L156">    }</span>
+
+    public void applyForce(float forceX, float forceY) {
+<span class="nc" id="L159">        this.velocityX += forceX;</span>
+<span class="nc" id="L160">        this.velocityY += forceY;</span>
+<span class="nc" id="L161">    }</span>
+
+    public String getColor() {
+<span class="nc" id="L164">        return color;</span>
+    }
+
+    public int getRadius() {
+<span class="nc" id="L168">        return 12;</span>
+    }
+
+    public void setCaptured(boolean captured) {
+<span class="nc" id="L172">        this.captured = captured; // or whatever logic you want for capturing</span>
+<span class="nc" id="L173">    }</span>
+
+    public void setCurrentSize(float newSize) {
+<span class="nc" id="L176">        this.currentSize = newSize;</span>
+<span class="nc" id="L177">    }</span>
+
+    private float constrain(float value, float min, float max) {
+<span class="nc" id="L180">        return Math.max(min, Math.min(max, value));</span>
+    }
+
+    public float getCurrentSize() {
+<span class="nc" id="L184">        return currentSize; // Getter for current size</span>
+    }
+
+    public float getTargetSize() {
+<span class="nc" id="L188">        return targetSize;</span>
+    }
+    public void attractToHole(Hole hole) {
+        // Calculate the center of the hole
+<span class="nc" id="L192">        float holeCenterX = hole.getCenterX();</span>
+<span class="nc" id="L193">        float holeCenterY = hole.getCenterY();</span>
+
+        // Calculate the distance vector to the center of the hole
+<span class="nc" id="L196">        PVector toHole = new PVector(holeCenterX - (x + currentSize / 2), holeCenterY - (y + currentSize / 2));</span>
+<span class="nc" id="L197">        float distance = toHole.mag(); // Get the distance to the center of the hole</span>
+<span class="nc" id="L198">        toHole.normalize(); // Normalize to get direction</span>
+
+        // Check if the ball is within a certain distance from the center of the hole
+<span class="nc bnc" id="L201" title="All 2 branches missed.">        if (distance &lt; 32 + getRadius()) { // 32 pixels + ball radius</span>
+<span class="nc" id="L202">            float attractionForce = 0.005f * distance; // 0.5% of distance</span>
+
+            // Apply the attraction force to the ball's velocity
+<span class="nc" id="L205">            applyForce(toHole.x * attractionForce, toHole.y * attractionForce);</span>
+
+            // Start shrinking if the ball is within the attraction radius and not already shrinking
+<span class="nc bnc" id="L208" title="All 2 branches missed.">            if (!shrinking) {</span>
+<span class="nc" id="L209">                startShrinking();</span>
+            }
+
+            // Reduce size based on proximity to the hole
+<span class="nc" id="L213">            currentSize = originalSize * (distance / 32);</span>
+<span class="nc" id="L214">            currentSize = constrain(currentSize, targetSize, originalSize); </span>
+
+            // Check if the ball is captured by the hole
+<span class="nc bnc" id="L217" title="All 2 branches missed.">            if (captured == true) {</span>
+<span class="nc" id="L218">                String holeType = String.valueOf(hole.type); // Get hole type as a String</span>
+<span class="nc" id="L219">                isCaptureSuccessfulFlag = isCaptureSuccessful(holeType);</span>
+                // Update score based on capture success
+<span class="nc" id="L221">                updateScore(isCaptureSuccessfulFlag, holeType);</span>
+                
+            }
+        } 
+<span class="nc" id="L225">    }</span>
+
+    private boolean isCaptureSuccessful(String holeType) {
+        // Grey ball or grey hole
+<span class="nc bnc" id="L229" title="All 4 branches missed.">        if (color.equals(&quot;grey&quot;) || holeType.equals(&quot;0&quot;)) {</span>
+<span class="nc" id="L230">            return true; // Always successful for grey</span>
+        }
+        // Check if the ball's color matches the hole's type
+<span class="nc" id="L233">        return color.equals(getColorFromHoleType(holeType));</span>
+    }
+
+    private String getColorFromHoleType(String holeType) {
+<span class="nc bnc" id="L237" title="All 6 branches missed.">        switch (holeType) {</span>
+<span class="nc" id="L238">            case &quot;0&quot;: return &quot;grey&quot;;</span>
+<span class="nc" id="L239">            case &quot;1&quot;: return &quot;orange&quot;;</span>
+<span class="nc" id="L240">            case &quot;2&quot;: return &quot;blue&quot;;</span>
+<span class="nc" id="L241">            case &quot;3&quot;: return &quot;green&quot;;</span>
+<span class="nc" id="L242">            case &quot;4&quot;: return &quot;yellow&quot;;</span>
+<span class="nc" id="L243">            default: return null; // Invalid type</span>
+        }
+    }
+
+    private void updateScore(boolean isCaptureSuccessful, String holeType) {
+<span class="nc bnc" id="L248" title="All 2 branches missed.">    if (!scoreUpdated) {</span>
+<span class="nc" id="L249">        System.out.println(&quot;Capture Successful: &quot; + isCaptureSuccessful + &quot;, Hole Type: &quot; + holeType);</span>
+<span class="nc bnc" id="L250" title="All 2 branches missed.">        if (isCaptureSuccessful) {</span>
+            // Successful capture
+<span class="nc" id="L252">            float scoreIncrease = App.scoreIncreaseModifier * ((App.currentLevelIndex+1));</span>
+<span class="nc" id="L253">            App.score += scoreIncrease; // Increase score</span>
+<span class="nc" id="L254">            System.out.println(&quot;Score increased by: &quot; + scoreIncrease + &quot;, New Score: &quot; + App.score);</span>
+<span class="nc" id="L255">        } else {</span>
+            // Unsuccessful capture
+<span class="nc" id="L257">            float scoreDecrease = App.scoreDecreaseModifier;</span>
+<span class="nc" id="L258">            App.score -= scoreDecrease; // Decrease score</span>
+<span class="nc" id="L259">            System.out.println(&quot;Score decreased by: &quot; + scoreDecrease + &quot;, New Score: &quot; + App.score);</span>
+        }
+<span class="nc" id="L261">        scoreUpdated = true; // Mark the score as updated to prevent further increments</span>
+    }
+<span class="nc" id="L263">}</span>
+
+
+
+    
+}
+</pre><div class="footer"><span class="right">Created with <a href="http://www.jacoco.org/jacoco">JaCoCo</a> 0.8.9.202303310957</span></div></body></html>

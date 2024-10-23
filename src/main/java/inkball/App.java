@@ -34,6 +34,7 @@ public class App extends PApplet {
 
     public static final int FPS = 30;
 
+    private final int TOTAL_MOVES = (BOARD_WIDTH - 1) * 2 + (BOARD_HEIGHT - 1) * 2;
     public String configPath;
 
     public static Random random = new Random();
@@ -48,6 +49,10 @@ public class App extends PApplet {
 
     private boolean isEnded = false;
 
+    private int yellowTile1X = 0;  // Top left corner
+    private int yellowTile1Y = 0;  // Top left corner
+    private int yellowTile2X = BOARD_WIDTH - 1;  // Bottom right corner
+    private int yellowTile2Y = BOARD_HEIGHT - 1; // Bottom right corner
     //List<Hole> holesList; // List to hold holes
     public boolean levelCompleted = false;
     List<int[]> spawners;
@@ -129,7 +134,7 @@ public class App extends PApplet {
         upcomingBalls = new ArrayList<>();
         ballXPositions = new float[maxDisplayBalls];
          // Balls from config file
-        int spawnIntervalCounter = spawnInterval * FPS;
+        float spawnIntervalCounter = spawnInterval * FPS;
         upcomingBalls = new ArrayList<>();
         activeBalls = new ArrayList<>();
         wallsList = new ArrayList<>();
@@ -208,16 +213,27 @@ public class App extends PApplet {
             ballXPositions[i] = i * (ballDisplaySize + 10); // Initial positions of the balls
         }
     }
-
-    private void checkLevelCompletion() {
-        if (allBallsAbsorbed()) {
+    private boolean checkLevelCompletion() {
+        if (allBallsAbsorbed() && currentLevelIndex <2) {
             currentLevelIndex++; // Move to the next level
             levelCompleted = true;
-            setupLevel(currentLevelIndex);
+            long elapsedTime = (millis() - startTime) / 1000;
+            score += ((time-elapsedTime)*0.067* scoreIncreaseModifier);      
+            return true;
         } else if (timeReached()) {
             // Stop displaying timer and score
             isEnded = true;
+            return true;
         }
+        if (allBallsAbsorbed() && currentLevelIndex ==2 ){
+            levelCompleted = true;
+            fill(0); 
+            textAlign(CENTER);
+            textSize(20);
+            text(" === ENDED === ", width / 2, 30);
+            return true;
+        }
+        return false;
     }
 
     private void restartLevel() {
@@ -271,7 +287,7 @@ public class App extends PApplet {
         ballsToSpawn.clear();  // Clear the ball list
         activeBalls.clear();   // Clear active balls
         playerLines.clear();   // Clear player-drawn lines
-
+        isEnded = false;
         // Reset the score to the pre-level state (assuming you store it)
         score = 0;
         startTime = millis();
@@ -364,7 +380,6 @@ public class App extends PApplet {
         background(255);
         updateUpcomingBalls(); // Update the ball queue and handle the sliding effect
         displayUpcomingBalls(); // Show the upcoming balls with the sliding effect
-       //String filepath = 
 
         //----------------------------------
         //display Board for current level:
@@ -374,6 +389,10 @@ public class App extends PApplet {
         drawBoard();
         spawnIntervalCounterModifier();
         if(!isPaused && !isEnded){
+            textSize(20);
+            double decimalNumber =  spawnIntervalCounter/ 30.0;
+            String result = String.format("%.2f", decimalNumber);
+            text("Spawning in: " +result , width/2-60, 30);
             BallMovement();
         }
         if(!isEnded){
@@ -382,11 +401,14 @@ public class App extends PApplet {
             text("Score: " + score, WIDTH - 150, 40); 
             displayTime();
         }
- 
-        checkLevelCompletion();
-         
-
         
+        if(checkLevelCompletion() && !isEnded){
+            
+            if(currentLevelIndex<=2){
+                setupLevel(currentLevelIndex);
+            }
+        }
+             
         if (isPaused) {
             fill(0); 
             textAlign(CENTER);
@@ -482,9 +504,7 @@ public class App extends PApplet {
         text("Time: " + timeString, WIDTH - 150, TOPBAR / 2 + 15); // Adjust the position as needed
     }
 
-   
-// Function to handle ball sliding animation when balls are added or removed
-// Function to handle ball sliding animation when balls are added or removed
+
 // Function to handle ball sliding animation when balls are added or removed
 public void updateUpcomingBalls() {
     // Only animate if there are balls to slide and the animation is triggered
@@ -535,8 +555,6 @@ public void updateUpcomingBalls() {
     shouldAnimate = slidingInProgress;
 }
 
-
-// Function to trigger ball list changes and start the animation
 public void onBallListChange() {
     // Ensure there are balls in the list before proceeding
     if (ballsToSpawn.isEmpty()) {
@@ -569,11 +587,6 @@ public void onBallListChange() {
 
 
 
-// Function to display upcoming balls
-// Function to display upcoming balls
-// Function to display upcoming balls
-// Function to display upcoming balls
-// Function to display upcoming balls
 // Function to display upcoming balls
 public void displayUpcomingBalls() {
     // Draw black background for the upcoming balls area
@@ -755,7 +768,6 @@ public void displayUpcomingBalls() {
             String nextBall = ballsToSpawn.remove(0); // Get the next ball
             onBallListChange();
             spawnBallFromSpawner(nextBall);
-            
             // Reset the interval counter
             spawnIntervalCounter = spawnInterval * FPS;
         }
@@ -765,8 +777,6 @@ public void displayUpcomingBalls() {
             checkLevelCompletion();  // Ensure that this is only called when all balls are done
         }
     }
-
-
 
     private void BallMovement() {
         // Temporary list to store lines and balls to be removed after the loops
@@ -829,19 +839,56 @@ public void displayUpcomingBalls() {
         playerLines.remove(line);
     }
 
-    public void checkBallCollisions() {
-        // Iterate over active balls and check for collisions with each line
-        for (Ball ball : activeBalls) {
-            // Iterate over lines and check for collisions
-            for (int i = playerLines.size() - 1; i >= 0; i--) {
-                PlayerLine line = playerLines.get(i);
-                if (line.checkCollisionWithBall(ball)) {
-                    playerLines.remove(i); // Remove the line if a collision occurred
-                }
-            }
-        }
-    }
+private long lastUpdateTime = 0; // Time of the last update
+private final long MOVE_INTERVAL = 67; // 0.067 seconds in milliseconds
+private int movesRemaining = TOTAL_MOVES; // Set the total moves here
 
+// Method to update yellow tile positions based on time
+private void updateYellowTiles() {
+    long currentTime = System.currentTimeMillis();
+
+    // Only update if enough time has passed
+    if (currentTime - lastUpdateTime >= MOVE_INTERVAL && movesRemaining > 0) {
+        // Update the last update time
+        lastUpdateTime = currentTime;
+
+        // Move yellow tile 1 (clockwise)
+        if (yellowTile1Y == 0 && yellowTile1X < BOARD_WIDTH - 1) {
+            yellowTile1X++;  // Move right
+        } else if (yellowTile1X == BOARD_WIDTH - 1 && yellowTile1Y < BOARD_HEIGHT - 1) {
+            yellowTile1Y++;  // Move down
+        } else if (yellowTile1Y == BOARD_HEIGHT - 1 && yellowTile1X > 0) {
+            yellowTile1X--;  // Move left
+        } else if (yellowTile1X == 0 && yellowTile1Y > 0) {
+            yellowTile1Y--;  // Move up
+        }
+
+        // Move yellow tile 2 (clockwise)
+        if (yellowTile2Y == BOARD_HEIGHT - 1 && yellowTile2X > 0) {
+            yellowTile2X--;  // Move left
+        } else if (yellowTile2X == 0 && yellowTile2Y > 0) {
+            yellowTile2Y--;  // Move up
+        } else if (yellowTile2Y == 0 && yellowTile2X < BOARD_WIDTH - 1) {
+            yellowTile2X++;  // Move right
+        } else if (yellowTile2X == BOARD_WIDTH - 1 && yellowTile2Y < BOARD_HEIGHT - 1) {
+            yellowTile2Y++;  // Move down
+        }
+
+        // Draw the updated positions of the yellow tiles
+        drawYellowTiles();
+
+        // Decrease the remaining moves
+        movesRemaining--;
+    }
+}
+
+// Method to draw yellow tiles at their final positions
+public void drawYellowTiles() {
+    image(walls[4], yellowTile1X * CELLSIZE, yellowTile1Y * CELLHEIGHT);
+    image(walls[4], yellowTile2X * CELLSIZE, yellowTile2Y * CELLHEIGHT);
+}
+
+// Call this method in your main draw loop
     public static void main(String[] args) {
         PApplet.main("inkball.App");
     }

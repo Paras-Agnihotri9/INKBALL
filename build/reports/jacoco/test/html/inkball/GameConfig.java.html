@@ -1,0 +1,89 @@
+<?xml version="1.0" encoding="UTF-8"?><!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd"><html xmlns="http://www.w3.org/1999/xhtml" lang="en"><head><meta http-equiv="Content-Type" content="text/html;charset=UTF-8"/><link rel="stylesheet" href="../jacoco-resources/report.css" type="text/css"/><link rel="shortcut icon" href="../jacoco-resources/report.gif" type="image/gif"/><title>GameConfig.java</title><link rel="stylesheet" href="../jacoco-resources/prettify.css" type="text/css"/><script type="text/javascript" src="../jacoco-resources/prettify.js"></script></head><body onload="window['PR_TAB_WIDTH']=4;prettyPrint()"><div class="breadcrumb" id="breadcrumb"><span class="info"><a href="../jacoco-sessions.html" class="el_session">Sessions</a></span><a href="../index.html" class="el_report">INKBALL</a> &gt; <a href="index.source.html" class="el_package">inkball</a> &gt; <span class="el_source">GameConfig.java</span></div><h1>GameConfig.java</h1><pre class="source lang-java linenums">package inkball;
+
+import processing.data.JSONArray;
+import processing.data.JSONObject;
+import processing.core.PApplet;
+
+import java.util.HashMap;
+import java.util.List;
+import java.util.ArrayList;
+
+public class GameConfig {
+    private JSONObject config;
+    private JSONArray levels;
+    private HashMap&lt;String, Integer&gt; scoreIncreaseFromHoleCapture;
+    private HashMap&lt;String, Integer&gt; scoreDecreaseFromWrongHole;
+
+<span class="nc" id="L17">    public GameConfig(PApplet applet, String configPath) {</span>
+        // Load the JSON configuration file
+<span class="nc" id="L19">        config = applet.loadJSONObject(configPath);</span>
+<span class="nc" id="L20">        levels = config.getJSONArray(&quot;levels&quot;);</span>
+
+        // Initialize score modifiers
+<span class="nc" id="L23">        scoreIncreaseFromHoleCapture = new HashMap&lt;&gt;();</span>
+<span class="nc" id="L24">        scoreDecreaseFromWrongHole = new HashMap&lt;&gt;();</span>
+        
+<span class="nc" id="L26">        JSONObject scoreIncrease = config.getJSONObject(&quot;score_increase_from_hole_capture&quot;);</span>
+<span class="nc" id="L27">        JSONObject scoreDecrease = config.getJSONObject(&quot;score_decrease_from_wrong_hole&quot;);</span>
+
+        // Populate the score modifiers
+<span class="nc bnc" id="L30" title="All 2 branches missed.">        for (Object key : scoreIncrease.keys()) {</span>
+<span class="nc" id="L31">            scoreIncreaseFromHoleCapture.put((String) key, scoreIncrease.getInt((String) key));</span>
+<span class="nc" id="L32">        }</span>
+
+<span class="nc bnc" id="L34" title="All 2 branches missed.">        for (Object key : scoreDecrease.keys()) {</span>
+<span class="nc" id="L35">            scoreDecreaseFromWrongHole.put((String) key, scoreDecrease.getInt((String) key));</span>
+<span class="nc" id="L36">        }</span>
+<span class="nc" id="L37">    }</span>
+
+    // Method to get level attributes for a specific level index
+    public JSONObject getLevel(int index) {
+<span class="nc bnc" id="L41" title="All 4 branches missed.">        if (index &lt; 0 || index &gt;= levels.size()) {</span>
+<span class="nc" id="L42">            throw new IllegalArgumentException(&quot;Invalid level index.&quot;);</span>
+        }
+<span class="nc" id="L44">        return levels.getJSONObject(index);</span>
+    }
+
+    // Method to get balls for a specific level
+    public List&lt;String&gt; getBalls(int levelIndex) {
+<span class="nc" id="L49">        JSONObject level = getLevel(levelIndex);</span>
+<span class="nc" id="L50">        JSONArray ballsArray = level.getJSONArray(&quot;balls&quot;);</span>
+<span class="nc" id="L51">        List&lt;String&gt; balls = new ArrayList&lt;&gt;();</span>
+<span class="nc bnc" id="L52" title="All 2 branches missed.">        for (int i = 0; i &lt; ballsArray.size(); i++) {</span>
+<span class="nc" id="L53">            balls.add(ballsArray.getString(i));</span>
+        }
+<span class="nc" id="L55">        return balls;</span>
+    }
+
+    // Method to get score increase based on ball color
+    public int getScoreIncrease(String color) {
+<span class="nc" id="L60">        return scoreIncreaseFromHoleCapture.getOrDefault(color, 0);</span>
+    }
+
+    // Method to get score decrease based on ball color
+    public int getScoreDecrease(String color) {
+<span class="nc" id="L65">        return scoreDecreaseFromWrongHole.getOrDefault(color, 0);</span>
+    }
+
+    // Method to access other level-specific data
+    public String getLayout(int levelIndex) {
+<span class="nc" id="L70">        return getLevel(levelIndex).getString(&quot;layout&quot;);</span>
+    }
+
+    public int getTime(int levelIndex) {
+<span class="nc" id="L74">        return getLevel(levelIndex).getInt(&quot;time&quot;);</span>
+    }
+
+    public int getSpawnInterval(int levelIndex) {
+<span class="nc" id="L78">        return getLevel(levelIndex).getInt(&quot;spawn_interval&quot;);</span>
+    }
+
+    public float getScoreIncreaseModifier(int levelIndex) {
+<span class="nc" id="L82">        return getLevel(levelIndex).getFloat(&quot;score_increase_from_hole_capture_modifier&quot;);</span>
+    }
+
+    public float getScoreDecreaseModifier(int levelIndex) {
+<span class="nc" id="L86">        return getLevel(levelIndex).getFloat(&quot;score_decrease_from_wrong_hole_modifier&quot;);</span>
+    }
+}
+</pre><div class="footer"><span class="right">Created with <a href="http://www.jacoco.org/jacoco">JaCoCo</a> 0.8.9.202303310957</span></div></body></html>

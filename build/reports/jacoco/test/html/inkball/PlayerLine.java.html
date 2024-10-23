@@ -1,0 +1,114 @@
+<?xml version="1.0" encoding="UTF-8"?><!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd"><html xmlns="http://www.w3.org/1999/xhtml" lang="en"><head><meta http-equiv="Content-Type" content="text/html;charset=UTF-8"/><link rel="stylesheet" href="../jacoco-resources/report.css" type="text/css"/><link rel="shortcut icon" href="../jacoco-resources/report.gif" type="image/gif"/><title>PlayerLine.java</title><link rel="stylesheet" href="../jacoco-resources/prettify.css" type="text/css"/><script type="text/javascript" src="../jacoco-resources/prettify.js"></script></head><body onload="window['PR_TAB_WIDTH']=4;prettyPrint()"><div class="breadcrumb" id="breadcrumb"><span class="info"><a href="../jacoco-sessions.html" class="el_session">Sessions</a></span><a href="../index.html" class="el_report">INKBALL</a> &gt; <a href="index.source.html" class="el_package">inkball</a> &gt; <span class="el_source">PlayerLine.java</span></div><h1>PlayerLine.java</h1><pre class="source lang-java linenums">package inkball;
+
+import java.awt.Color;
+import java.util.ArrayList;
+import processing.core.PApplet;
+import processing.core.PVector;
+
+public class PlayerLine {
+    private ArrayList&lt;PVector&gt; segments; // Store the line segments
+    private Color color;                 // Line color
+    private int thickness;               // Line thickness
+    private boolean complete;
+    
+<span class="nc" id="L14">    public PlayerLine(Color color, int thickness) {</span>
+<span class="nc" id="L15">        this.segments = new ArrayList&lt;&gt;();</span>
+<span class="nc" id="L16">        this.color = color;</span>
+<span class="nc" id="L17">        this.thickness = thickness;</span>
+<span class="nc" id="L18">        this.complete = false;</span>
+<span class="nc" id="L19">    }</span>
+
+    public boolean intersects(float mouseX, float mouseY) {
+<span class="nc bnc" id="L22" title="All 2 branches missed.">        for (PVector segment : segments) {</span>
+<span class="nc" id="L23">            float distance = PApplet.dist(mouseX, mouseY, segment.x, segment.y);</span>
+<span class="nc bnc" id="L24" title="All 2 branches missed.">            if (distance &lt;= thickness / 2) { // Check if within the line thickness</span>
+<span class="nc" id="L25">                return true;</span>
+            }
+<span class="nc" id="L27">        }</span>
+<span class="nc" id="L28">        return false;</span>
+    }
+
+    // Add a new segment to the line
+    public void addSegment(float x, float y) {
+<span class="nc" id="L33">        segments.add(new PVector(x, y));</span>
+<span class="nc" id="L34">    }</span>
+
+    // Render the line
+    public void display(PApplet app) {
+<span class="nc" id="L38">        app.stroke(color.getRGB());</span>
+<span class="nc" id="L39">        app.strokeWeight(thickness);</span>
+<span class="nc bnc" id="L40" title="All 2 branches missed.">        for (int i = 0; i &lt; segments.size() - 1; i++) {</span>
+<span class="nc" id="L41">            PVector start = segments.get(i);</span>
+<span class="nc" id="L42">            PVector end = segments.get(i + 1);</span>
+<span class="nc" id="L43">            app.line(start.x, start.y, end.x, end.y);</span>
+        }
+<span class="nc" id="L45">    }</span>
+
+    // Check if the ball is colliding with the line segment defined by points P1 and P2
+    // Check if the ball is colliding with the line segment defined by points P1 and P2
+    public boolean checkCollisionWithBall(Ball ball) {
+<span class="nc bnc" id="L50" title="All 2 branches missed.">        if (ball.hasCollided()) return false; // Ignore if already collided</span>
+
+<span class="nc bnc" id="L52" title="All 2 branches missed.">        for (int i = segments.size() - 1; i &gt;= 0; i--) {</span>
+<span class="nc" id="L53">            PVector p1 = segments.get(i);</span>
+<span class="nc bnc" id="L54" title="All 2 branches missed.">            PVector p2 = (i == segments.size() - 1) ? segments.get(i) : segments.get(i + 1);</span>
+            
+<span class="nc bnc" id="L56" title="All 2 branches missed.">            if (isCollidingWithSegment(ball, p1, p2)) {</span>
+<span class="nc" id="L57">                System.out.println(&quot;Collision detected with segment: &quot; + i);</span>
+<span class="nc" id="L58">                reflectBall(ball, p1, p2);</span>
+<span class="nc" id="L59">                ball.setHasCollided(true); // Set collision flag</span>
+<span class="nc" id="L60">                return true; // Return true if collision occurs</span>
+            }
+        }
+<span class="nc" id="L63">        return false; // No collision</span>
+    }
+
+
+    private boolean isCollidingWithSegment(Ball ball, PVector p1, PVector p2) {
+        // Ball collision detection logic (as previously written)
+<span class="nc" id="L69">        PVector ballPosition = new PVector(ball.getX() + ball.getRadius(), ball.getY() + ball.getRadius());</span>
+<span class="nc" id="L70">        PVector ballVelocity = new PVector(ball.getVelocityX(), ball.getVelocityY());</span>
+<span class="nc" id="L71">        PVector predictedPosition = PVector.add(ballPosition, ballVelocity);</span>
+<span class="nc" id="L72">        float distanceToSegment = distToSegment(predictedPosition, p1, p2);</span>
+<span class="nc bnc" id="L73" title="All 2 branches missed.">        return distanceToSegment &lt;= ball.getRadius();</span>
+    }
+
+    private float distToSegment(PVector point, PVector p1, PVector p2) {
+        // Distance calculation logic (as previously written)
+<span class="nc" id="L78">        float segmentLengthSquared = PApplet.dist(p1.x, p1.y, p2.x, p2.y) * PApplet.dist(p1.x, p1.y, p2.x, p2.y);</span>
+<span class="nc bnc" id="L79" title="All 2 branches missed.">        if (segmentLengthSquared == 0) return PApplet.dist(point.x, point.y, p1.x, p1.y);</span>
+<span class="nc" id="L80">        float t = ((point.x - p1.x) * (p2.x - p1.x) + (point.y - p1.y) * (p2.y - p1.y)) / segmentLengthSquared;</span>
+<span class="nc" id="L81">        t = PApplet.constrain(t, 0, 1);</span>
+<span class="nc" id="L82">        PVector closestPoint = PVector.add(p1, PVector.sub(p2, p1).mult(t));</span>
+<span class="nc" id="L83">        return PApplet.dist(point.x, point.y, closestPoint.x, closestPoint.y);</span>
+    }
+
+    private void reflectBall(Ball ball, PVector p1, PVector p2) {
+<span class="nc" id="L87">        PVector ballVelocity = new PVector(ball.getVelocityX(), ball.getVelocityY());</span>
+<span class="nc" id="L88">        PVector normal = new PVector(-(p2.y - p1.y), p2.x - p1.x).normalize();</span>
+        
+<span class="nc" id="L90">        float dotProduct = ballVelocity.dot(normal);</span>
+<span class="nc" id="L91">        PVector newVelocity = PVector.sub(ballVelocity, normal.mult(2 * dotProduct));</span>
+        
+        // Optional: Normalize the new velocity if needed
+<span class="nc" id="L94">        float maxVelocity = 5.0f; // Define a maximum velocity</span>
+<span class="nc" id="L95">        newVelocity.limit(maxVelocity); // Limit the velocity to prevent jitter</span>
+
+<span class="nc" id="L97">        ball.setVelocity(newVelocity.x, newVelocity.y);</span>
+<span class="nc" id="L98">    }</span>
+
+    public void addSegment(int x, int y) {
+<span class="nc" id="L101">        segments.add(new PVector(x, y));</span>
+<span class="nc" id="L102">    }</span>
+
+
+    public boolean isComplete() {
+<span class="nc" id="L106">        return complete;</span>
+    }
+
+    public void setComplete(boolean complete) {
+<span class="nc" id="L110">        this.complete = complete;</span>
+<span class="nc" id="L111">    }</span>
+
+}
+</pre><div class="footer"><span class="right">Created with <a href="http://www.jacoco.org/jacoco">JaCoCo</a> 0.8.9.202303310957</span></div></body></html>
