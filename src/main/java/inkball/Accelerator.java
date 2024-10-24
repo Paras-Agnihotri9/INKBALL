@@ -4,9 +4,9 @@ import processing.core.PApplet;
 import processing.core.PImage;
 
 public class Accelerator {
-    private int x, y;  // Position of the accelerator
-    private String type;  // "top", "bottom", "left", or "right"
-    private PImage image;  // Image representing the accelerator
+    private int x, y;
+    private String type; 
+    private PImage image;
 
     // Constructor to initialize position, type, and image
     public Accelerator(int x, int y, String type, PImage image) {
