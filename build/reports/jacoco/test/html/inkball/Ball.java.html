@@ -42,240 +42,349 @@ public class Ball {
 <span class="fc" id="L42">        this.captured = false;</span>
 <span class="fc" id="L43">        this.currentSize = originalSize; // Start at the original size</span>
 <span class="fc" id="L44">    }</span>
+
+
     public String getBallId(){
-<span class="fc" id="L46">        return color;</span>
+<span class="fc" id="L48">        return color;</span>
     }
 
+    /**
+     * updates the position of the ball according to its velocity, also responsible for shrinking the ball when shriking is set to true.
+     */
     public void update( ) {
             // Move the ball by velocity
-<span class="fc" id="L51">            x += velocityX;</span>
-<span class="fc" id="L52">            y += velocityY;</span>
+<span class="fc" id="L56">            x += velocityX;</span>
+<span class="fc" id="L57">            y += velocityY;</span>
 
             // Handle shrinking if the shrinking flag is set
-<span class="fc bfc" id="L55" title="All 2 branches covered.">            if (shrinking) {</span>
-<span class="fc" id="L56">                currentSize -= shrinkRate; // Decrease size by shrinkRate</span>
+<span class="fc bfc" id="L60" title="All 2 branches covered.">            if (shrinking) {</span>
+<span class="fc" id="L61">                currentSize -= shrinkRate; // Decrease size by shrinkRate</span>
 
                 // Ensure currentSize doesn't go below targetSize
-<span class="pc bpc" id="L59" title="1 of 2 branches missed.">                if (currentSize &lt;= targetSize) {</span>
-<span class="nc" id="L60">                    currentSize = targetSize; // Clamp the size</span>
-<span class="nc" id="L61">                    shrinking = false; // Stop shrinking</span>
+<span class="pc bpc" id="L64" title="1 of 2 branches missed.">                if (currentSize &lt;= targetSize) {</span>
+<span class="nc" id="L65">                    currentSize = targetSize; // Clamp the size</span>
+<span class="nc" id="L66">                    shrinking = false; // Stop shrinking</span>
                 }
             }
-<span class="fc" id="L64">    }</span>
+<span class="fc" id="L69">    }</span>
 
-     public void display(PApplet app) {
-<span class="pc bpc" id="L67" title="1 of 2 branches missed.">        if (!captured) { // Only display if not captured</span>
-<span class="fc" id="L68">            int ballIndex = getColorIndex(color);</span>
+    /**
+     * display function responsible to display the image of the ball at the given co-ordinates of the ball
+     * @param app the PApplet instance to draw the ball
+     */
+
+    public void display(PApplet app) {
+<span class="pc bpc" id="L77" title="1 of 2 branches missed.">        if (!captured) { // Only display if not captured</span>
+<span class="fc" id="L78">            int ballIndex = getColorIndex(color);</span>
             // Display the ball image at the current size (scale the image)
-<span class="fc" id="L70">            app.image(balls[ballIndex], x, y, currentSize, currentSize);</span>
+<span class="fc" id="L80">            app.image(balls[ballIndex], x, y, currentSize, currentSize);</span>
         }
-<span class="fc" id="L72">    }</span>
+<span class="fc" id="L82">    }</span>
 
+    /**
+     * returns the color index based on the string color.
+     * @param color color of the ball
+     * @return color as a number
+     */
     private int getColorIndex(String color) {
-<span class="pc bpc" id="L75" title="4 of 6 branches missed.">        switch (color) {</span>
+<span class="pc bpc" id="L90" title="4 of 6 branches missed.">        switch (color) {</span>
             case &quot;grey&quot;:
-<span class="nc" id="L77">                return 0;</span>
+<span class="nc" id="L92">                return 0;</span>
             case &quot;orange&quot;:
-<span class="fc" id="L79">                return 1;</span>
+<span class="fc" id="L94">                return 1;</span>
             case &quot;blue&quot;:
-<span class="fc" id="L81">                return 2;</span>
+<span class="fc" id="L96">                return 2;</span>
             case &quot;green&quot;:
-<span class="nc" id="L83">                return 3;</span>
+<span class="nc" id="L98">                return 3;</span>
             case &quot;yellow&quot;:
-<span class="nc" id="L85">                return 4;</span>
+<span class="nc" id="L100">                return 4;</span>
             default:
-<span class="nc" id="L87">                return 0; // Default to grey if not found</span>
+<span class="nc" id="L102">                return 0; // Default to grey if not found</span>
         }
     }
 
-    public void startShrinking() {
-<span class="fc" id="L92">        targetSize = 12; // Set target size for shrinking</span>
-<span class="fc" id="L93">        shrinking = true; // Start the shrinking process</span>
-<span class="fc" id="L94">    }</span>
-
+    /**
+     * returns the X coordinate.
+     * @return x the value of the x coordinate
+     */
     public float getX() {
-<span class="fc" id="L97">        return x;</span>
+<span class="fc" id="L111">        return x;</span>
     }
 
+    /**
+     * returns the Y coordinate.
+     * @return Y the value of the y coordinate
+     */
     public float getY() {
-<span class="fc" id="L101">        return y;</span>
+<span class="fc" id="L119">        return y;</span>
     }
 
+    /**
+     * Sets the velocity of the ball
+     * @param newVelocityX takes in the new velocity to set it
+     * @param newVelocityY takes in the new velocity to set it
+     */
     public void setVelocity(float newVelocityX, float newVelocityY) {
-<span class="fc" id="L105">        this.velocityX = newVelocityX;  // Update the actual velocity</span>
-<span class="fc" id="L106">        this.velocityY = newVelocityY;  // Update the actual velocity</span>
-<span class="fc" id="L107">        System.out.println(&quot;VelocityX&quot; + velocityX);</span>
-<span class="fc" id="L108">        System.out.println(&quot;VelocityY&quot; + velocityY);</span>
-<span class="fc" id="L109">    }</span>
+<span class="fc" id="L128">        this.velocityX = newVelocityX;  </span>
+<span class="fc" id="L129">        this.velocityY = newVelocityY;</span>
+<span class="fc" id="L130">    }</span>
 
+    /**
+     * Reverses Horizontal direction
+     */
     public void reverseHorizontalDirection() {
-<span class="nc" id="L112">        velocityX *= -1;  // Reverse X velocity (horizontal direction)</span>
-<span class="nc" id="L113">    }</span>
+<span class="fc" id="L136">        velocityX *= -1;</span>
+<span class="fc" id="L137">    }</span>
 
+    /**
+     * Reverses vertical direction
+     */
     public void reverseVerticalDirection() {
-<span class="fc" id="L116">        velocityY *= -1;  // Reverse Y velocity (vertical direction)</span>
-<span class="fc" id="L117">    }</span>
+<span class="fc" id="L143">        velocityY *= -1;</span>
+<span class="fc" id="L144">    }</span>
 
+    /**
+     * sets color
+     * @param new_color takes new color to set new color
+     */
     public void setColor(String new_color) {
-<span class="nc" id="L120">        color = new_color;</span>
-<span class="nc" id="L121">    }</span>
+<span class="nc" id="L151">        color = new_color;</span>
+<span class="nc" id="L152">    }</span>
 
+    /**
+     * sets X coordinate
+     * @param xCordinate takes in the xcordinate to set it
+     */
     public void setX(float xCordinate) {
-<span class="fc" id="L124">        this.x = xCordinate;</span>
-<span class="fc" id="L125">    }</span>
+<span class="fc" id="L159">        this.x = xCordinate;</span>
+<span class="fc" id="L160">    }</span>
 
+    /**
+     * sets Y coordinate
+     * @param yCordinate takes in the xcordinate to set it
+     */
     public void setY(float yCordinate) {
-<span class="fc" id="L128">        this.y = yCordinate;</span>
-<span class="fc" id="L129">    }</span>
+<span class="fc" id="L167">        this.y = yCordinate;</span>
+<span class="fc" id="L168">    }</span>
 
-    public void resetCollision() {
-<span class="fc" id="L132">        hasCollided = false; // Reset for the next frame</span>
-<span class="fc" id="L133">    }</span>
-
+    /**
+     * returns the Hascollided boolean
+     * @return true if there has been a collision, false if there hasnt
+     */
     public boolean hasCollided() {
-<span class="fc" id="L136">        return hasCollided; // Getter for collision status</span>
+<span class="fc" id="L175">        return hasCollided; // Getter for collision status</span>
     }
 
+    /**
+     * sets the has collided boolean
+     * @param hasCollided takes in hasCollided in order to set it
+     */
     public void setHasCollided(boolean hasCollided) {
-<span class="fc" id="L140">        this.hasCollided = hasCollided; // Setter for collision status</span>
-<span class="fc" id="L141">    }</span>
+<span class="fc" id="L183">        this.hasCollided = hasCollided; // Setter for collision status</span>
+<span class="fc" id="L184">    }</span>
 
+    /**
+     * resets the collision boolean
+     */
+    public void resetCollision() {
+<span class="fc" id="L190">        hasCollided = false; // Reset for the next frame</span>
+<span class="fc" id="L191">    }</span>
+
+
+    /**
+     * Changes the velocity progressively
+     * @param forceX takes in the forceX in order to increase the X velocity
+     * @param forceY takes in the forceY in order to increase the Y velocity
+     */
     public void applyForce(float forceX, float forceY) {
-<span class="nc" id="L144">        this.velocityX += forceX;</span>
-<span class="nc" id="L145">        this.velocityY += forceY;</span>
-<span class="nc" id="L146">    }</span>
+<span class="fc" id="L200">        this.velocityX += forceX;</span>
+<span class="fc" id="L201">        this.velocityY += forceY;</span>
+<span class="fc" id="L202">    }</span>
 
+    /**
+     *  Returns the color of the ball
+     * @return color of the ball
+     */
     public String getColor() {
-<span class="fc" id="L149">        return color;</span>
+<span class="fc" id="L209">        return color;</span>
     }
 
+    /**
+     *  Returns the radius of the ball
+     * @return the radius of the ball
+     */
     public int getRadius() {
-<span class="fc" id="L153">        return 12;</span>
+<span class="fc" id="L217">        return 12;</span>
     }
 
+    /**
+     * sets the captured boolean
+     * @param captured sets the captured boolean
+     */
     public void setCaptured(boolean captured) {
-<span class="nc" id="L157">        this.captured = captured; // or whatever logic you want for capturing</span>
-<span class="nc" id="L158">    }</span>
+<span class="fc" id="L225">        this.captured = captured;</span>
+<span class="fc" id="L226">    }</span>
 
+    /**
+     * Sets the size of the ball
+     * @param newSize sets the newSize value
+     */
     public void setCurrentSize(float newSize) {
-<span class="nc" id="L161">        this.currentSize = newSize;</span>
-<span class="nc" id="L162">    }</span>
+<span class="nc" id="L233">        this.currentSize = newSize;</span>
+<span class="nc" id="L234">    }</span>
 
+    /**
+     * return the constraint between 3 numbers
+     * @param value takes in a value 
+     * @param min takes in the minimum
+     * @param max takes in the maximum
+     * @return the constraint is returned 
+     */
     private float constrain(float value, float min, float max) {
-<span class="nc" id="L165">        return Math.max(min, Math.min(max, value));</span>
+<span class="fc" id="L244">        return Math.max(min, Math.min(max, value));</span>
     }
 
+    /**
+     * returns the current size of the ball
+     * @return currentSize is returned
+     */
     public float getCurrentSize() {
-<span class="fc" id="L169">        return currentSize; // Getter for current size</span>
+<span class="fc" id="L252">        return currentSize; // Getter for current size</span>
     }
 
+    /**
+     * returns the target size of the ball
+     * @return targetSize is returned
+     */
     public float getTargetSize() {
-<span class="nc" id="L173">        return targetSize;</span>
+<span class="nc" id="L260">        return targetSize;</span>
     }
 
+    /**
+     * Responsible for attracting the ball towards the closest hole when the ball is within 32px of the board.
+     * @param holes a list of holes is passed so that the closest one can be determined
+     * 
+     */
 
-public void attractToHoles(List&lt;Hole&gt; holes) {
-<span class="fc" id="L178">    Hole closestHole = null;</span>
-<span class="fc" id="L179">    float closestDistance = Float.MAX_VALUE;</span>
+    public void attractToHoles(List&lt;Hole&gt; holes) {
+<span class="fc" id="L270">        Hole closestHole = null;</span>
+<span class="fc" id="L271">        float closestDistance = Float.MAX_VALUE;</span>
 
-    // Find the closest hole
-<span class="fc bfc" id="L182" title="All 2 branches covered.">    for (Hole hole : holes) {</span>
-<span class="fc" id="L183">        float holeCenterX = hole.getCenterX();</span>
-<span class="fc" id="L184">        float holeCenterY = hole.getCenterY();</span>
+        // Find the closest hole
+<span class="fc bfc" id="L274" title="All 2 branches covered.">        for (Hole hole : holes) {</span>
+<span class="fc" id="L275">            float holeCenterX = hole.getCenterX();</span>
+<span class="fc" id="L276">            float holeCenterY = hole.getCenterY();</span>
 
-        // Calculate distance from the ball's center to the hole's center
-<span class="fc" id="L187">        PVector toHole = new PVector(holeCenterX - (x + currentSize / 2), holeCenterY - (y + currentSize / 2));</span>
-<span class="fc" id="L188">        float distance = toHole.mag(); // Get the distance to the center of the hole</span>
+            // Calculate distance from the ball's center to the hole's center
+<span class="fc" id="L279">            PVector toHole = new PVector(holeCenterX - (x + currentSize / 2), holeCenterY - (y + currentSize / 2));</span>
+<span class="fc" id="L280">            float distance = toHole.mag(); // Get the distance to the center of the hole</span>
 
-        // Update if this hole is closer
-<span class="fc bfc" id="L191" title="All 2 branches covered.">        if (distance &lt; closestDistance) {</span>
-<span class="fc" id="L192">            closestDistance = distance;</span>
-<span class="fc" id="L193">            closestHole = hole;</span>
+            // Update if this hole is closer
+<span class="fc bfc" id="L283" title="All 2 branches covered.">            if (distance &lt; closestDistance) {</span>
+<span class="fc" id="L284">                closestDistance = distance;</span>
+<span class="fc" id="L285">                closestHole = hole;</span>
+            }
+<span class="fc" id="L287">        }</span>
+
+<span class="pc bpc" id="L289" title="1 of 4 branches missed.">        if (closestHole != null &amp;&amp; closestDistance &lt; 32 + getRadius()) {</span>
+            // The ball is within attraction range of the closest hole
+<span class="fc" id="L291">            PVector toHole = new PVector(</span>
+<span class="fc" id="L292">                    closestHole.getCenterX() - (x + currentSize / 2),</span>
+<span class="fc" id="L293">                    closestHole.getCenterY() - (y + currentSize / 2)</span>
+            );
+<span class="fc" id="L295">            toHole.normalize(); // Normalize direction to the hole</span>
+
+            // Apply attraction force based on proximity
+<span class="fc" id="L298">            float attractionForce = 0.005f * closestDistance; // 0.5% of distance</span>
+<span class="fc" id="L299">            applyForce(toHole.x * attractionForce, toHole.y * attractionForce);</span>
+
+            // Start shrinking if not already shrinking
+<span class="pc bpc" id="L302" title="2 of 4 branches missed.">            if (!shrinking &amp;&amp; !outOfBounds) {</span>
+<span class="nc" id="L303">                shrinking = true;</span>
+            }
+
+            // Reduce size based on proximity to the closest hole
+<span class="fc" id="L307">            currentSize = originalSize * (closestDistance / 32);</span>
+<span class="fc" id="L308">            currentSize = constrain(currentSize, targetSize, originalSize);</span>
+
+            // Check if the ball is captured by the hole
+<span class="pc bpc" id="L311" title="1 of 2 branches missed.">            if (closestDistance &lt; getRadius()) {</span>
+<span class="fc" id="L312">                setCaptured(true);</span>
+<span class="fc" id="L313">                String holeType = String.valueOf(closestHole.type); // Get hole type as a String</span>
+<span class="fc" id="L314">                isCaptureSuccessfulFlag = isCaptureSuccessful(holeType);</span>
+<span class="fc" id="L315">                updateScore(isCaptureSuccessfulFlag, holeType); // Update score based on capture success</span>
+            }
+<span class="fc" id="L317">        } else {</span>
+            // Ball is no longer in range of any hole, reset size
+<span class="fc" id="L319">            resetToOriginalSize();</span>
+<span class="fc" id="L320">            outOfBounds = true; // Set flag indicating the ball is out of bounds</span>
         }
-<span class="fc" id="L195">    }</span>
-
-<span class="pc bpc" id="L197" title="2 of 4 branches missed.">    if (closestHole != null &amp;&amp; closestDistance &lt; 32 + getRadius()) {</span>
-        // The ball is within attraction range of the closest hole
-<span class="nc" id="L199">        PVector toHole = new PVector(</span>
-<span class="nc" id="L200">                closestHole.getCenterX() - (x + currentSize / 2),</span>
-<span class="nc" id="L201">                closestHole.getCenterY() - (y + currentSize / 2)</span>
-        );
-<span class="nc" id="L203">        toHole.normalize(); // Normalize direction to the hole</span>
-
-        // Apply attraction force based on proximity
-<span class="nc" id="L206">        float attractionForce = 0.005f * closestDistance; // 0.5% of distance</span>
-<span class="nc" id="L207">        applyForce(toHole.x * attractionForce, toHole.y * attractionForce);</span>
-
-        // Start shrinking if not already shrinking
-<span class="nc bnc" id="L210" title="All 4 branches missed.">        if (!shrinking &amp;&amp; !outOfBounds) {</span>
-<span class="nc" id="L211">            startShrinking();</span>
-        }
-
-        // Reduce size based on proximity to the closest hole
-<span class="nc" id="L215">        currentSize = originalSize * (closestDistance / 32);</span>
-<span class="nc" id="L216">        currentSize = constrain(currentSize, targetSize, originalSize);</span>
-
-        // Check if the ball is captured by the hole
-<span class="nc bnc" id="L219" title="All 2 branches missed.">        if (closestDistance &lt; getRadius()) {</span>
-<span class="nc" id="L220">            setCaptured(true);</span>
-<span class="nc" id="L221">            String holeType = String.valueOf(closestHole.type); // Get hole type as a String</span>
-<span class="nc" id="L222">            isCaptureSuccessfulFlag = isCaptureSuccessful(holeType);</span>
-<span class="nc" id="L223">            updateScore(isCaptureSuccessfulFlag, holeType); // Update score based on capture success</span>
-        }
-<span class="nc" id="L225">    } else {</span>
-        // Ball is no longer in range of any hole, reset size
-<span class="fc" id="L227">        resetToOriginalSize();</span>
-<span class="fc" id="L228">        outOfBounds = true; // Set flag indicating the ball is out of bounds</span>
-    }
-<span class="fc" id="L230">}</span>
+<span class="fc" id="L322">    }</span>
 
 
+    /**
+     * resets the ball to its original size
+     */
     public void resetToOriginalSize() {
         // Only reset the ball size if it's not shrinking and hasn't been captured
-<span class="pc bpc" id="L235" title="1 of 2 branches missed.">        if (!captured) {</span>
-<span class="fc" id="L236">            currentSize = originalSize;  // Restore the original size</span>
-<span class="fc" id="L237">            shrinking = false;  // Stop any shrinking process</span>
-<span class="fc" id="L238">            outOfBounds = true; // Keep outOfBounds flag true</span>
+<span class="pc bpc" id="L330" title="1 of 2 branches missed.">        if (!captured) {</span>
+<span class="fc" id="L331">            currentSize = originalSize;  // Restore the original size</span>
+<span class="fc" id="L332">            shrinking = false;  // Stop any shrinking process</span>
+<span class="fc" id="L333">            outOfBounds = true; // Keep outOfBounds flag true</span>
         }
-<span class="fc" id="L240">    }</span>
+<span class="fc" id="L335">    }</span>
 
+    /**
+     * return whether the capture was succesful or not
+     * @param holeType uses the type of hole to determine whether it has been a succesful capture or not
+     * @return captureSuccessful if the capture has been succesful
+     */
     private boolean isCaptureSuccessful(String holeType) {
             // Grey ball or grey hole
-<span class="nc bnc" id="L244" title="All 4 branches missed.">        if (color.equals(&quot;grey&quot;) || holeType.equals(&quot;0&quot;)) {</span>
-<span class="nc" id="L245">                return true; // Always successful for grey</span>
+<span class="pc bpc" id="L344" title="2 of 4 branches missed.">        if (color.equals(&quot;grey&quot;) || holeType.equals(&quot;0&quot;)) {</span>
+<span class="nc" id="L345">                return true; // Always successful for grey</span>
             }
             // Check if the ball's color matches the hole's type
-<span class="nc" id="L248">            return color.equals(getColorFromHoleType(holeType));</span>
+<span class="fc" id="L348">            return color.equals(getColorFromHoleType(holeType));</span>
         }
 
+    /**
+     * returns the color of the hole based on its type
+     * @return color
+     */
     private String getColorFromHoleType(String holeType) {
-<span class="nc bnc" id="L252" title="All 6 branches missed.">            switch (holeType) {</span>
-<span class="nc" id="L253">                case &quot;0&quot;: return &quot;grey&quot;;</span>
-<span class="nc" id="L254">                case &quot;1&quot;: return &quot;orange&quot;;</span>
-<span class="nc" id="L255">                case &quot;2&quot;: return &quot;blue&quot;;</span>
-<span class="nc" id="L256">                case &quot;3&quot;: return &quot;green&quot;;</span>
-<span class="nc" id="L257">                case &quot;4&quot;: return &quot;yellow&quot;;</span>
-<span class="nc" id="L258">                default: return null; // Invalid type</span>
+<span class="pc bpc" id="L356" title="5 of 6 branches missed.">            switch (holeType) {</span>
+<span class="nc" id="L357">                case &quot;0&quot;: return &quot;grey&quot;;</span>
+<span class="nc" id="L358">                case &quot;1&quot;: return &quot;orange&quot;;</span>
+<span class="fc" id="L359">                case &quot;2&quot;: return &quot;blue&quot;;</span>
+<span class="nc" id="L360">                case &quot;3&quot;: return &quot;green&quot;;</span>
+<span class="nc" id="L361">                case &quot;4&quot;: return &quot;yellow&quot;;</span>
+<span class="nc" id="L362">                default: return null; // Invalid type</span>
             }
         }
 
+    /**
+     * updates the score according to the level and score modifier, reduces the score when the capture is unsuccesful and increases the score when the capture is succesful.
+     * @param isCaptureSuccessful takes in the return value from the function to determine whether to increase/decrease the score.
+     * @param holeType used to know which hole the ball has been capture into
+     */
     public void updateScore(boolean isCaptureSuccessful, String holeType) {
-<span class="nc bnc" id="L263" title="All 2 branches missed.">        if (!scoreUpdated) {</span>
-<span class="nc" id="L264">            System.out.println(&quot;Capture Successful: &quot; + isCaptureSuccessful + &quot;, Hole Type: &quot; + holeType);</span>
-<span class="nc bnc" id="L265" title="All 2 branches missed.">            if (isCaptureSuccessful) {</span>
+<span class="fc bfc" id="L372" title="All 2 branches covered.">        if (!scoreUpdated) {</span>
+<span class="fc" id="L373">            System.out.println(&quot;Capture Successful: &quot; + isCaptureSuccessful + &quot;, Hole Type: &quot; + holeType);</span>
+<span class="pc bpc" id="L374" title="1 of 2 branches missed.">            if (isCaptureSuccessful) {</span>
                 // Successful capture
-<span class="nc" id="L267">                float scoreIncrease = App.scoreIncreaseModifier * (App.currentLevelIndex+1);</span>
-<span class="nc" id="L268">                App.score += scoreIncrease; // Increase score</span>
-<span class="nc" id="L269">                System.out.println(&quot;Score increased by: &quot; + scoreIncrease + &quot;, New Score: &quot; + App.score);</span>
-<span class="nc" id="L270">            } else {</span>
+<span class="fc" id="L376">                float scoreIncrease = App.scoreIncreaseModifier * (App.currentLevelIndex+1);</span>
+<span class="fc" id="L377">                App.score += scoreIncrease; // Increase score</span>
+<span class="fc" id="L378">                System.out.println(&quot;Score increased by: &quot; + scoreIncrease + &quot;, New Score: &quot; + App.score);</span>
+<span class="fc" id="L379">            } else {</span>
                 // Unsuccessful capture
-<span class="nc" id="L272">                float scoreDecrease = App.scoreDecreaseModifier;</span>
-<span class="nc" id="L273">                App.score -= scoreDecrease; // Decrease score</span>
-<span class="nc" id="L274">                System.out.println(&quot;Score decreased by: &quot; + scoreDecrease + &quot;, New Score: &quot; + App.score);</span>
+<span class="nc" id="L381">                float scoreDecrease = App.scoreDecreaseModifier;</span>
+<span class="nc" id="L382">                App.score -= scoreDecrease; // Decrease score</span>
+<span class="nc" id="L383">                System.out.println(&quot;Score decreased by: &quot; + scoreDecrease + &quot;, New Score: &quot; + App.score);</span>
             }
-<span class="nc" id="L276">            scoreUpdated = true; // Mark the score as updated to prevent further increments</span>
+<span class="fc" id="L385">            scoreUpdated = true; // Mark the score as updated to prevent further increments</span>
         }
-<span class="nc" id="L278">    }</span>
+<span class="fc" id="L387">    }</span>
     
 }
 </pre><div class="footer"><span class="right">Created with <a href="http://www.jacoco.org/jacoco">JaCoCo</a> 0.8.9.202303310957</span></div></body></html>

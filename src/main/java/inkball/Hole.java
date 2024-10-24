@@ -15,18 +15,34 @@ public class Hole {
         this.type = type;
     }
 
+    /**
+     * return the X coordinate of the Hole
+     * @return X
+     */
     public float getX() {
         return x;
     }
 
+    /**
+     * returns the Y coordinate of the hole
+     * @return Y
+     */
     public float getY() {
         return y;
     }
 
+    /**
+     * returns the X Center coordinate of the hole
+     * @return the X Center coordinate of the hole
+     */
     public float getCenterX() {
         return ((x+1) * App.CELLHEIGHT); // Center X of the hole
     }
 
+    /**
+     * returns the Y Center coordinate of the hole
+     * @return the X Center coordinate of the hole
+     */
     public float getCenterY() {
         return ((y+1) * App.CELLHEIGHT); // Center Y of the hole
     }

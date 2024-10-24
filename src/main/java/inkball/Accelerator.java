@@ -16,12 +16,18 @@ public class Accelerator {
         this.image = image;
     }
 
-    // Function to display the accelerator on the game screen
+    /**
+     * Function to display the accelerator on the game screen
+     * @param app app the PApplet instance to draw the accelerator
+     * */ 
     public void display(PApplet app) {
         app.image(image, x * App.CELLSIZE, y * App.CELLHEIGHT, App.CELLSIZE, App.CELLHEIGHT);
     }
 
-    // Function to accelerate the ball when it comes over the accelerator
+    /** 
+     * Function to accelerate the ball when it comes over the accelerator
+     * @param ball the ball instance to check overlapping
+     */ 
     public void applyAcceleration(Ball ball) {
         if (isOverlapping(ball)) {
             switch (type) {
@@ -41,7 +47,11 @@ public class Accelerator {
         }
     }
 
-    // Check if the ball overlaps with the accelerator (basic AABB collision detection)
+    /**
+     * Check if the ball overlaps with the accelerator
+     * @param ball chceks overlapping using AABB logic
+     * @return true if the ball is overlapping, false if the ball isnt.
+     */
     private boolean isOverlapping(Ball ball) {
         float ballCenterX = ball.getX() + ball.getRadius();
         float ballCenterY = ball.getY() + ball.getRadius();

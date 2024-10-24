@@ -15,20 +15,36 @@ public class Hole {
 <span class="fc" id="L15">        this.type = type;</span>
 <span class="fc" id="L16">    }</span>
 
+    /**
+     * return the X coordinate of the Hole
+     * @return X
+     */
     public float getX() {
-<span class="nc" id="L19">        return x;</span>
+<span class="nc" id="L23">        return x;</span>
     }
 
+    /**
+     * returns the Y coordinate of the hole
+     * @return Y
+     */
     public float getY() {
-<span class="nc" id="L23">        return y;</span>
+<span class="nc" id="L31">        return y;</span>
     }
 
+    /**
+     * returns the X Center coordinate of the hole
+     * @return the X Center coordinate of the hole
+     */
     public float getCenterX() {
-<span class="fc" id="L27">        return ((x+1) * App.CELLHEIGHT); // Center X of the hole</span>
+<span class="fc" id="L39">        return ((x+1) * App.CELLHEIGHT); // Center X of the hole</span>
     }
 
+    /**
+     * returns the Y Center coordinate of the hole
+     * @return the X Center coordinate of the hole
+     */
     public float getCenterY() {
-<span class="fc" id="L31">        return ((y+1) * App.CELLHEIGHT); // Center Y of the hole</span>
+<span class="fc" id="L47">        return ((y+1) * App.CELLHEIGHT); // Center Y of the hole</span>
     }
 
 }

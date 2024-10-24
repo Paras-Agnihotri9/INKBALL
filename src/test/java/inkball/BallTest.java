@@ -51,7 +51,7 @@ public class BallTest {
         // Test the ball's shrinking functionality
         Ball ball = new Ball(50, 50, "yellow", app.balls);
         
-        ball.startShrinking();
+        ball.shrinking = true;
         
         float initialSize = ball.getCurrentSize();
         ball.update(); // Call update to trigger shrinking

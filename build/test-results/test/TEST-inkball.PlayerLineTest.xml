@@ -1,8 +1,8 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<testsuite name="inkball.PlayerLineTest" tests="8" skipped="0" failures="1" errors="0" timestamp="2024-10-24T13:43:36" hostname="parass-mbp.shared.sydney.edu.au" time="0.31">
+<testsuite name="inkball.PlayerLineTest" tests="8" skipped="0" failures="1" errors="0" timestamp="2024-10-24T17:14:49" hostname="parass-mbp.shared.sydney.edu.au" time="0.482">
   <properties/>
-  <testcase name="testAddSegment()" classname="inkball.PlayerLineTest" time="0.042"/>
-  <testcase name="testReflectBall()" classname="inkball.PlayerLineTest" time="0.035">
+  <testcase name="testAddSegment()" classname="inkball.PlayerLineTest" time="0.055"/>
+  <testcase name="testReflectBall()" classname="inkball.PlayerLineTest" time="0.056">
     <failure message="org.opentest4j.AssertionFailedError: expected: &lt;true&gt; but was: &lt;false&gt;" type="org.opentest4j.AssertionFailedError">org.opentest4j.AssertionFailedError: expected: &lt;true&gt; but was: &lt;false&gt;
 	at org.junit.jupiter.api.AssertionUtils.fail(AssertionUtils.java:55)
 	at org.junit.jupiter.api.AssertTrue.assertTrue(AssertTrue.java:40)
@@ -95,13 +95,15 @@
 	at worker.org.gradle.process.internal.worker.GradleWorkerMain.main(GradleWorkerMain.java:74)
 </failure>
   </testcase>
-  <testcase name="testCheckCollisionWithBall()" classname="inkball.PlayerLineTest" time="0.039"/>
-  <testcase name="testIsCompleteInitially()" classname="inkball.PlayerLineTest" time="0.041"/>
-  <testcase name="testSetComplete()" classname="inkball.PlayerLineTest" time="0.041"/>
-  <testcase name="testInitialization()" classname="inkball.PlayerLineTest" time="0.034"/>
-  <testcase name="testDisplay()" classname="inkball.PlayerLineTest" time="0.042"/>
-  <testcase name="testIntersects()" classname="inkball.PlayerLineTest" time="0.031"/>
-  <system-out><![CDATA[Failed to load the board
+  <testcase name="testCheckCollisionWithBall()" classname="inkball.PlayerLineTest" time="0.104"/>
+  <testcase name="testIsCompleteInitially()" classname="inkball.PlayerLineTest" time="0.059"/>
+  <testcase name="testSetComplete()" classname="inkball.PlayerLineTest" time="0.063"/>
+  <testcase name="testInitialization()" classname="inkball.PlayerLineTest" time="0.037"/>
+  <testcase name="testDisplay()" classname="inkball.PlayerLineTest" time="0.062"/>
+  <testcase name="testIntersects()" classname="inkball.PlayerLineTest" time="0.041"/>
+  <system-out><![CDATA[Spawning ball of type orange at 96, 288
+Spawning ball of type blue at 448, 384
+Failed to load the board
 New wall added 4at17 0
 New wall added 4at1 1
  x 8 y 1 type: 1
@@ -127,8 +129,6 @@ New wall added 4at15 15
 New wall added 4at1 16
 New wall added 4at16 16
 New wall added 4at17 17
-VelocityX1.0
-VelocityY1.0
 Spawning ball of type orange at 96, 288
 Spawning ball of type blue at 448, 384
 [green, grey, grey, blue, yellow, orange, blue, grey]
@@ -163,11 +163,17 @@ New wall added 4at17 17
 [green, grey, grey, blue, yellow, orange, blue, grey]
 Spawning ball of type orange at 96, 288
 Spawning ball of type blue at 448, 384
+[green, grey, grey, blue, yellow, orange, blue, grey]
+[green, grey, grey, blue, yellow, orange, blue, grey]
+[green, grey, grey, blue, yellow, orange, blue, grey]
+[green, grey, grey, blue, yellow, orange, blue, grey]
+[green, grey, grey, blue, yellow, orange, blue, grey]
+[green, grey, grey, blue, yellow, orange, blue, grey]
 [green, grey, grey, blue, yellow, orange, blue, grey]
 [green, grey, grey, blue, yellow, orange, blue, grey]
 Collision detected with segment: 0
-VelocityX2.0
-VelocityY2.0
+[green, grey, grey, blue, yellow, orange, blue, grey]
+[green, grey, grey, blue, yellow, orange, blue, grey]
 Failed to load the board
 New wall added 4at17 0
 New wall added 4at1 1
@@ -177,9 +183,11 @@ New wall added 4at2 2
 New wall added 4at15 2
 New wall added 4at3 3
 New wall added 4at14 3
+[green, grey, grey, blue, yellow, orange, blue, grey]
 New wall added 4at4 4
 New wall added 4at13 4
 New wall added 4at5 5
+[green, grey, grey, blue, yellow, orange, blue, grey]
 New wall added 4at12 5
  x 15 y 7 type: 0
 New wall added 4at5 12
@@ -194,12 +202,12 @@ New wall added 4at15 15
 New wall added 4at1 16
 New wall added 4at16 16
 New wall added 4at17 17
-[green, grey, grey, blue, yellow, orange, blue, grey]
-[green, grey, grey, blue, yellow, orange, blue, grey]
-[green, grey, grey, blue, yellow, orange, blue, grey]
-[green, grey, grey, blue, yellow, orange, blue, grey]
 Spawning ball of type orange at 96, 288
 Spawning ball of type blue at 448, 384
+[green, grey, grey, blue, yellow, orange, blue, grey]
+[green, grey, grey, blue, yellow, orange, blue, grey]
+[green, grey, grey, blue, yellow, orange, blue, grey]
+[green, grey, grey, blue, yellow, orange, blue, grey]
 [green, grey, grey, blue, yellow, orange, blue, grey]
 [green, grey, grey, blue, yellow, orange, blue, grey]
 Failed to load the board
@@ -221,86 +229,10 @@ New wall added 4at12 12
 New wall added 4at4 13
 New wall added 4at13 13
 New wall added 4at3 14
+[green, grey, grey, blue, yellow, orange, blue, grey]
 New wall added 4at14 14
 New wall added 4at2 15
- x 9 y 15 type: 2
-New wall added 4at15 15
-New wall added 4at1 16
-New wall added 4at16 16
-New wall added 4at17 17
 [green, grey, grey, blue, yellow, orange, blue, grey]
-[green, grey, grey, blue, yellow, orange, blue, grey]
-[green, grey, grey, blue, yellow, orange, blue, grey]
-[green, grey, grey, blue, yellow, orange, blue, grey]
-[green, grey, grey, blue, yellow, orange, blue, grey]
-[green, grey, grey, blue, yellow, orange, blue, grey]
-Spawning ball of type orange at 96, 288
-Spawning ball of type blue at 448, 384
-[green, grey, grey, blue, yellow, orange, blue, grey]
-[green, grey, grey, blue, yellow, orange, blue, grey]
-Failed to load the board
-New wall added 4at17 0
-New wall added 4at1 1
- x 8 y 1 type: 1
-New wall added 4at16 1
-New wall added 4at2 2
-New wall added 4at15 2
-New wall added 4at3 3
-New wall added 4at14 3
-New wall added 4at4 4
-New wall added 4at13 4
-New wall added 4at5 5
-New wall added 4at12 5
- x 15 y 7 type: 0
-New wall added 4at5 12
-New wall added 4at12 12
-New wall added 4at4 13
-New wall added 4at13 13
-New wall added 4at3 14
-New wall added 4at14 14
-New wall added 4at2 15
- x 9 y 15 type: 2
-New wall added 4at15 15
-New wall added 4at1 16
-New wall added 4at16 16
-New wall added 4at17 17
-[green, grey, grey, blue, yellow, orange, blue, grey]
-[green, grey, grey, blue, yellow, orange, blue, grey]
-[green, grey, grey, blue, yellow, orange, blue, grey]
-[green, grey, grey, blue, yellow, orange, blue, grey]
-[green, grey, grey, blue, yellow, orange, blue, grey]
-[green, grey, grey, blue, yellow, orange, blue, grey]
-[green, grey, grey, blue, yellow, orange, blue, grey]
-[green, grey, grey, blue, yellow, orange, blue, grey]
-Spawning ball of type orange at 96, 288
-Spawning ball of type blue at 448, 384
-[green, grey, grey, blue, yellow, orange, blue, grey]
-[green, grey, grey, blue, yellow, orange, blue, grey]
-[green, grey, grey, blue, yellow, orange, blue, grey]
-[green, grey, grey, blue, yellow, orange, blue, grey]
-[green, grey, grey, blue, yellow, orange, blue, grey]
-Failed to load the board
-[green, grey, grey, blue, yellow, orange, blue, grey]
-New wall added 4at17 0
-New wall added 4at1 1
- x 8 y 1 type: 1
-New wall added 4at16 1
-New wall added 4at2 2
-New wall added 4at15 2
-New wall added 4at3 3
-New wall added 4at14 3
-New wall added 4at4 4
-New wall added 4at13 4
-New wall added 4at5 5
-New wall added 4at12 5
- x 15 y 7 type: 0
-New wall added 4at5 12
-New wall added 4at12 12
-New wall added 4at4 13
-New wall added 4at13 13
-New wall added 4at3 14
-New wall added 4at14 14
-New wall added 4at2 15
  x 9 y 15 type: 2
 New wall added 4at15 15
 New wall added 4at1 16
@@ -320,6 +252,8 @@ Spawning ball of type blue at 448, 384
 [green, grey, grey, blue, yellow, orange, blue, grey]
 [green, grey, grey, blue, yellow, orange, blue, grey]
 [green, grey, grey, blue, yellow, orange, blue, grey]
+[green, grey, grey, blue, yellow, orange, blue, grey]
+[green, grey, grey, blue, yellow, orange, blue, grey]
 Failed to load the board
 New wall added 4at17 0
 New wall added 4at1 1
@@ -346,6 +280,104 @@ New wall added 4at15 15
 New wall added 4at1 16
 New wall added 4at16 16
 New wall added 4at17 17
+[green, grey, grey, blue, yellow, orange, blue, grey]
+[green, grey, grey, blue, yellow, orange, blue, grey]
+[green, grey, grey, blue, yellow, orange, blue, grey]
+[green, grey, grey, blue, yellow, orange, blue, grey]
+[green, grey, grey, blue, yellow, orange, blue, grey]
+[green, grey, grey, blue, yellow, orange, blue, grey]
+Spawning ball of type orange at 96, 288
+Spawning ball of type blue at 448, 384
+[green, grey, grey, blue, yellow, orange, blue, grey]
+[green, grey, grey, blue, yellow, orange, blue, grey]
+[green, grey, grey, blue, yellow, orange, blue, grey]
+[green, grey, grey, blue, yellow, orange, blue, grey]
+[green, grey, grey, blue, yellow, orange, blue, grey]
+[green, grey, grey, blue, yellow, orange, blue, grey]
+[green, grey, grey, blue, yellow, orange, blue, grey]
+[green, grey, grey, blue, yellow, orange, blue, grey]
+[green, grey, grey, blue, yellow, orange, blue, grey]
+[green, grey, grey, blue, yellow, orange, blue, grey]
+Failed to load the board
+New wall added 4at17 0
+New wall added 4at1 1
+ x 8 y 1 type: 1
+New wall added 4at16 1
+New wall added 4at2 2
+New wall added 4at15 2
+New wall added 4at3 3
+New wall added 4at14 3
+New wall added 4at4 4
+New wall added 4at13 4
+New wall added 4at5 5
+New wall added 4at12 5
+ x 15 y 7 type: 0
+New wall added 4at5 12
+New wall added 4at12 12
+New wall added 4at4 13
+New wall added 4at13 13
+New wall added 4at3 14
+New wall added 4at14 14
+New wall added 4at2 15
+ x 9 y 15 type: 2
+New wall added 4at15 15
+New wall added 4at1 16
+New wall added 4at16 16
+New wall added 4at17 17
+[green, grey, grey, blue, yellow, orange, blue, grey]
+[green, grey, grey, blue, yellow, orange, blue, grey]
+Spawning ball of type orange at 96, 288
+Spawning ball of type blue at 448, 384
+[green, grey, grey, blue, yellow, orange, blue, grey]
+[green, grey, grey, blue, yellow, orange, blue, grey]
+[green, grey, grey, blue, yellow, orange, blue, grey]
+[green, grey, grey, blue, yellow, orange, blue, grey]
+[green, grey, grey, blue, yellow, orange, blue, grey]
+[green, grey, grey, blue, yellow, orange, blue, grey]
+[green, grey, grey, blue, yellow, orange, blue, grey]
+[green, grey, grey, blue, yellow, orange, blue, grey]
+[green, grey, grey, blue, yellow, orange, blue, grey]
+[green, grey, grey, blue, yellow, orange, blue, grey]
+[green, grey, grey, blue, yellow, orange, blue, grey]
+[green, grey, grey, blue, yellow, orange, blue, grey]
+[green, grey, grey, blue, yellow, orange, blue, grey]
+[green, grey, grey, blue, yellow, orange, blue, grey]
+[green, grey, grey, blue, yellow, orange, blue, grey]
+[green, grey, grey, blue, yellow, orange, blue, grey]
+Failed to load the board
+New wall added 4at17 0
+New wall added 4at1 1
+ x 8 y 1 type: 1
+New wall added 4at16 1
+New wall added 4at2 2
+New wall added 4at15 2
+New wall added 4at3 3
+New wall added 4at14 3
+New wall added 4at4 4
+New wall added 4at13 4
+New wall added 4at5 5
+New wall added 4at12 5
+ x 15 y 7 type: 0
+New wall added 4at5 12
+New wall added 4at12 12
+New wall added 4at4 13
+New wall added 4at13 13
+New wall added 4at3 14
+New wall added 4at14 14
+New wall added 4at2 15
+ x 9 y 15 type: 2
+New wall added 4at15 15
+New wall added 4at1 16
+New wall added 4at16 16
+New wall added 4at17 17
+[green, grey, grey, blue, yellow, orange, blue, grey]
+[green, grey, grey, blue, yellow, orange, blue, grey]
+[green, grey, grey, blue, yellow, orange, blue, grey]
+[green, grey, grey, blue, yellow, orange, blue, grey]
+[green, grey, grey, blue, yellow, orange, blue, grey]
+[green, grey, grey, blue, yellow, orange, blue, grey]
+Spawning ball of type orange at 96, 288
+Spawning ball of type blue at 448, 384
 [green, grey, grey, blue, yellow, orange, blue, grey]
 [green, grey, grey, blue, yellow, orange, blue, grey]
 [green, grey, grey, blue, yellow, orange, blue, grey]

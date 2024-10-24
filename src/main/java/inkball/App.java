@@ -78,7 +78,7 @@ public class App extends PApplet {
     int nextBallIndex = 0; // Index to track the next ball to spawn
     boolean shouldAnimate = false; // Flag to trigger sliding animation
     int numDisplayedBalls = 0; // Number of balls currently displayed
-    double slidingSpeed = 0.5; // Speed of the sliding animation
+    double slidingSpeed = 0.001; // Speed of the sliding animation
     int ballDisplaySize = 32; // Size of the ball images
     PImage tile;
     PImage spawner;
@@ -91,8 +91,12 @@ public class App extends PApplet {
     public PImage[] holes;
     boolean[][] occupied;
     boolean [][] occupiedBall;
+    boolean isWon = false;
     int type;
 
+    /**
+     * Initiallizes a color map according to the symbol
+     */
     private void initializeBallColorMap() {
         ballColorMap = new HashMap<>();
         ballColorMap.put("B0", "grey");
@@ -185,7 +189,7 @@ public class App extends PApplet {
 
     /**
      * Takes in the level index, sets up Configuration data and game variables, also loads the level using the layou address
-     * @param levelIndex
+     * @param levelIndex uses the level index to set up multiple game variables
      */
     public void setupLevel(int levelIndex) {
         // Call restartLevel to reset everything except the score
@@ -219,6 +223,8 @@ public class App extends PApplet {
     }
 
     /**
+     * Checks if the Level has been completed by calling the timeReached() method as well as checking if all the balls have been absorbed
+     * @return true if the level is completed false if the level is not completed
      */
     public boolean checkLevelCompletion() {
 
@@ -233,6 +239,8 @@ public class App extends PApplet {
 
             else if(currentLevelIndex ==2 ){
             levelCompleted = true;
+            isEnded =true;
+            isWon = true;
             fill(0); 
             textAlign(CENTER);
             textSize(20);
@@ -249,6 +257,9 @@ public class App extends PApplet {
         return false;
     }
 
+    /**
+     * Clears previous level data and Initializes data for the new level
+     */
     public void newLevel() {
         // Clear all game objects and reset variables, except for the score
         playerLines.clear();
@@ -273,18 +284,14 @@ public class App extends PApplet {
         resetOccupiedBall();
     }
 
+    /**
+     * Checks if the level time has been reached.
+     * @return returns if the elapsed time is more than the level time.
+     */
     public boolean timeReached() {
         long elapsedTime = (millis() - startTime) / 1000; // Calculate elapsed time in seconds
         return elapsedTime >= time;
     }
-
-    private void displayGameEndMessage() {
-        fill(0);
-        textAlign(CENTER);
-        textSize(32);
-        text("ENDED", WIDTH / 2, HEIGHT / 2);
-    }
-
 
 	@Override
     public void keyPressed(KeyEvent event){
@@ -296,6 +303,9 @@ public class App extends PApplet {
         }
     }
 
+    /**
+     * restarts level according to the button press being R.
+     */
     public void restartLevelR() {
         // Reset timer
 
@@ -307,7 +317,6 @@ public class App extends PApplet {
         ballsToSpawn.clear();  // Clear player-drawn lines
         isEnded = false;
         levelCompleted = false;
-        // Reset the score to the pre-level state (assuming you store it)
         score = 0;
         startTime = millis();
         // Reinitialize the level to its initial state
@@ -323,6 +332,9 @@ public class App extends PApplet {
         resetOccupiedBall();
     }
 
+    /**
+     * Sets the isPaused Boolean to true when the spacebar is pressed.
+     */
     public void togglePause() {
         isPaused = !isPaused;  // Toggle the pause state
 
@@ -335,7 +347,8 @@ public class App extends PApplet {
     }
 
 
-@Override
+
+    @Override
     public void mousePressed(MouseEvent e) {
         if (mouseButton == PConstants.LEFT) { // Left mouse button
             if (keyPressed && key == PConstants.CONTROL) {
@@ -375,7 +388,9 @@ public class App extends PApplet {
         }
     }
 
-    // Helper function to remove a line if mouse is near it
+    /**
+     * removes a line when there is an intersection between the X,Y axis of the Mouse and the line.
+     */
     private void removeLineAtMouse() {
         // Check if the mouse position collides with any player-drawn line
         for (int i = playerLines.size() - 1; i >= 0; i--) {
@@ -387,13 +402,13 @@ public class App extends PApplet {
             }
         }
     }
+    
     /**
      * Draw all elements in the game by current frame.
      */
 	@Override
     public void draw() {
         background(255);
-        updateUpcomingBalls(); // Update the ball queue and handle the sliding effect
         displayUpcomingBalls(); // Show the upcoming balls with the sliding effect
 
         //----------------------------------
@@ -435,7 +450,7 @@ public class App extends PApplet {
             }
         }
 
-        if(isEnded){
+        if(isEnded && !isWon){
             fill(0); 
             textAlign(CENTER);
             textSize(20);
@@ -444,7 +459,11 @@ public class App extends PApplet {
     }
 
     char[][] board;
-
+    
+    /**
+     * Responsible for Loading the level and initiallising data such as Holes, Accelerators and walls.
+     * @param filepath takes in the file path to create instances of walls, accelerators etc according to the level
+     */
     public void loadLevel(String filepath) {
         board = new char[BOARD_WIDTH][BOARD_HEIGHT];
         spawners = new ArrayList<>();
@@ -506,8 +525,10 @@ public class App extends PApplet {
         }
     }
 
-
-     public void displayTime() {
+    /**
+     * Responsible for displaying time at the top right corner of the app screen.
+     */
+    public void displayTime() {
         long elapsedTime = (millis() - startTime) / 1000; // Calculate elapsed time in seconds
 
         String timeString = String.valueOf(elapsedTime); // Convert to String
@@ -518,113 +539,61 @@ public class App extends PApplet {
         text("Time: " + timeString, WIDTH - 150, TOPBAR / 2 + 15); // Adjust the position as needed
     }
 
-
-// Function to handle ball sliding animation when balls are added or removed
-public void updateUpcomingBalls() {
-    // Only animate if there are balls to slide and the animation is triggered
-    if (shouldAnimate) {
-        // Slide all balls to their target positions
-        for (int i = 0; i < numDisplayedBalls; i++) {
-            float targetX = i * (ballDisplaySize + 10);  // Target position for each ball
-
-            // If the current ball hasn't reached its target position, keep sliding
-            if (ballXPositions[i] > targetX) {
-                ballXPositions[i] -= slidingSpeed;  // Slide left by a small amount
-                if (ballXPositions[i] < targetX) {
-                    ballXPositions[i] = targetX;  // Correct overshoot
+    /**
+     * Handles the updating of the upcoming balls whenever there is a change in the number of balls.
+     */
+    public void onBallListChange() {
+        if (ballsToSpawn.isEmpty()) {
+            return;
+        }
+        // Check the number of balls to display, capped at maxDisplayBalls
+        int numberOfBallsToShow = Math.min(ballsToSpawn.size(), maxDisplayBalls);
+        // Only trigger animation when the list size changes
+        if (ballsToSpawn.size() != numDisplayedBalls) {
+            shouldAnimate = true;  // Trigger animation
+            // Set initial positions for all balls (evenly spaced)
+            for (int i = 0; i < numberOfBallsToShow; i++) {
+                ballXPositions[i] = i * (ballDisplaySize + 10);  // Correct positions
+            }
+            // Handle the new ball sliding in from the right
+            if (ballsToSpawn.size() > numberOfBallsToShow) {
+                // Ensure we don't exceed the bounds of ballXPositions array
+                if (numberOfBallsToShow < maxDisplayBalls) {
+                    ballXPositions[numberOfBallsToShow] = maxDisplayBalls * (ballDisplaySize + 10);  // Start new ball off-screen
                 }
             }
+            numDisplayedBalls = numberOfBallsToShow;  // Update displayed ball count
         }
+    }
 
-        // If the first ball has slid off-screen, remove it and adjust the array
-        if (ballXPositions[0] <= -ballDisplaySize) {
-            // Remove the first ball from the spawn list
-            ballsToSpawn.remove(0);
 
-            // Shift remaining balls' positions left
-            for (int i = 1; i < numDisplayedBalls; i++) {
-                ballXPositions[i - 1] = ballXPositions[i];
+
+    /**
+     * This function is responsible for displaying the balls that are to come in the game 
+     */
+    public void displayUpcomingBalls() {
+        // Draw black background for the upcoming balls area
+        fill(0);
+        rect(0, 0, (maxDisplayBalls + 1) * ballDisplaySize, ballDisplaySize + 20);
+        // Display the upcoming balls
+        for (int i = 0; i < numDisplayedBalls; i++) {
+            // Get the ball ID from ballsToSpawn safely
+            if (i >= ballsToSpawn.size()) {
+                continue;  // Avoid out of bounds access
             }
-
-            // Set the last ball to slide in from the right
-            if (ballsToSpawn.size() >= numDisplayedBalls) {
-                ballXPositions[numDisplayedBalls - 1] = maxDisplayBalls * (ballDisplaySize + 10);  // Offscreen on the right
-            }
-
-            // Update the number of displayed balls
-            numDisplayedBalls = Math.min(ballsToSpawn.size(), maxDisplayBalls);
+            String ballId = ballsToSpawn.get(i);
+            // Map ball ID to its type (0: grey, 1: orange, 2: blue, 3: green, 4: yellow)
+            int type = getBallType(ballId);
+            // Draw the ball at its current position from ballXPositions array
+            image(balls[type], ballXPositions[i], 10, ballDisplaySize, ballDisplaySize);
         }
     }
 
-    // Keep animating if any ball is still sliding
-    boolean slidingInProgress = false;
-    for (int i = 0; i < numDisplayedBalls; i++) {
-        float targetX = i * (ballDisplaySize + 10);
-        if (ballXPositions[i] > targetX) {
-            slidingInProgress = true;
-        }
-    }
-
-    // Stop animation only if no ball is moving anymore
-    shouldAnimate = slidingInProgress;
-}
-
-public void onBallListChange() {
-    // Ensure there are balls in the list before proceeding
-    if (ballsToSpawn.isEmpty()) {
-        return;  // Exit early if there are no balls to animate
-    }
-
-    // Check the number of balls to display, capped at maxDisplayBalls
-    int numberOfBallsToShow = Math.min(ballsToSpawn.size(), maxDisplayBalls);
-
-    // Only trigger animation when the list size changes
-    if (ballsToSpawn.size() != numDisplayedBalls) {
-        shouldAnimate = true;  // Trigger animation
-
-        // Set initial positions for all balls (evenly spaced)
-        for (int i = 0; i < numberOfBallsToShow; i++) {
-            ballXPositions[i] = i * (ballDisplaySize + 10);  // Correct positions
-        }
-
-        // Handle the new ball sliding in from the right
-        if (ballsToSpawn.size() > numberOfBallsToShow) {
-            // Ensure we don't exceed the bounds of ballXPositions array
-            if (numberOfBallsToShow < maxDisplayBalls) {
-                ballXPositions[numberOfBallsToShow] = maxDisplayBalls * (ballDisplaySize + 10);  // Start new ball off-screen
-            }
-        }
-
-        numDisplayedBalls = numberOfBallsToShow;  // Update displayed ball count
-    }
-}
-
-
-
-// Function to display upcoming balls
-public void displayUpcomingBalls() {
-    // Draw black background for the upcoming balls area
-    fill(0);
-    rect(0, 0, (maxDisplayBalls + 1) * ballDisplaySize, ballDisplaySize + 20);
-
-    // Display the upcoming balls
-    for (int i = 0; i < numDisplayedBalls; i++) {
-        // Get the ball ID from ballsToSpawn safely
-        if (i >= ballsToSpawn.size()) {
-            continue;  // Avoid out of bounds access
-        }
-        String ballId = ballsToSpawn.get(i);
-
-        // Map ball ID to its type (0: grey, 1: orange, 2: blue, 3: green, 4: yellow)
-        int type = getBallType(ballId);
-
-        // Draw the ball at its current position from ballXPositions array
-        image(balls[type], ballXPositions[i], 10, ballDisplaySize, ballDisplaySize);
-    }
-}
-
-
-    // Helper function to get ball type based on its ID
+    /**
+     * takes in the ball color as string and returns an integer based off that 
+     * @param ballId
+     * @return 0 if the ball is grey, 1 if the ball is orange, 2 if the ball is blue, 3 if the ball is green, 4 if the ball yellow, 0 by default
+     */
     private int getBallType(String ballId) {
         switch (ballId) {
             case "grey": return 0;
@@ -637,7 +606,9 @@ public void displayUpcomingBalls() {
     }
 
 
-
+    /**
+     * Draws the basic board structure including tiles walls and spawns balls from where balls are detected
+     */
     public void drawBoard() {
         for (int y = 2; y < BOARD_HEIGHT; y++) {
             for (int x = 0; x < BOARD_WIDTH; x++) {
@@ -746,6 +717,11 @@ public void displayUpcomingBalls() {
         }
     }
 
+
+    /**
+     * Spawns the balls from a random spawner
+     * @param ballId uses the ballId to spawn the ball from a spawner
+     */
     public void spawnBallFromSpawner(String ballId) {
         if (spawners.isEmpty()) return; // No spawners found
 
@@ -757,6 +733,12 @@ public void displayUpcomingBalls() {
             activeBalls.add(newBall);
         }
 
+    /**
+     * Spawns the ball from the board
+     * @param ballId takes in the ballId in order to create an object of type ball
+     * @param xCor takes in the x -coordinate for the position
+     * @param yCor takes in the y -coordinate for the position
+     */
     public void spawnBallFromBoard(String ballId, int xCor, int yCor){
         xCor = xCor * CELLSIZE;
         yCor = yCor * CELLHEIGHT;
@@ -765,6 +747,9 @@ public void displayUpcomingBalls() {
         println("Spawning ball of type " + ballId + " at " + xCor + ", " + yCor);
     }
 
+    /**
+     * resets the occupied boolean so it can be used for the next level
+     */
     private void resetOccupied() {
         for (int y = 0; y < BOARD_HEIGHT; y++) {
             for (int x = 0; x < BOARD_WIDTH; x++) {
@@ -773,6 +758,9 @@ public void displayUpcomingBalls() {
         }   
     }
 
+    /**
+     * Resets the space occupied by balls so it can be used for the next level
+     */
     private void resetOccupiedBall(){
         for (int y = 0; y < BOARD_HEIGHT; y++) {
                 for (int x = 0; x < BOARD_WIDTH; x++) {
@@ -781,6 +769,9 @@ public void displayUpcomingBalls() {
             }  
     }
 
+    /**
+     * Changes the spawn interval counter in order to spawn the balls at the time that they are supposed to
+     */
     public void spawnIntervalCounterModifier() {
         // Count down the spawn interval
         if (spawnIntervalCounter > 0) {
@@ -800,6 +791,9 @@ public void displayUpcomingBalls() {
         }
     }
 
+    /**
+     * major method responsible for all ball related movement such as colliding with walls and player lines, interaction with holes and accelerators
+     */
     public void BallMovement() {
         // Temporary list to store lines and balls to be removed after the loops
         List<PlayerLine> linesToRemove = new ArrayList<>();
@@ -845,32 +839,30 @@ public void displayUpcomingBalls() {
         // Remove absorbed balls and lines
         activeBalls.removeAll(ballsToRemove);
         playerLines.removeAll(linesToRemove);
-
-        // Do not handle spawning here anymore; rely on spawnIntervalCounterModifier to handle spawning
     }
     
 
+    /**
+     * Responsible for displaying the line that is drawn by the player
+     */
     public void displayLine(){
         for (PlayerLine line : playerLines) {
         line.display(this); // Display each complete line
         }
-    // If there's a line being drawn (currentLine), render it as well
         if (currentLine != null) {
             currentLine.display(this); // Display the current line being drawn
         }
     }
 
+    /**
+     * Responsible for displaying the Accelerators on the game board
+     */
     public void displayAccelerator(){
         for (Accelerator accelerator : acceleratorList){
                 accelerator.display(this);
             }
     }
 
-    public void removeLine(PlayerLine line) {
-        playerLines.remove(line);
-    }
-
-// Call this method in your main draw loop
     public static void main(String[] args) {
         PApplet.main("inkball.App");
     }

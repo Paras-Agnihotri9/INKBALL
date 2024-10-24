@@ -36,54 +36,93 @@ public class GameConfig {
 <span class="fc" id="L36">        }</span>
 <span class="fc" id="L37">    }</span>
 
-    // Method to get level attributes for a specific level index
+    /** 
+     *  Method to get level attributes for a specific level index
+     * @param index used to know what level we are on
+     * @return returns the attributes at that index
+    */
     public JSONObject getLevel(int index) {
-<span class="pc bpc" id="L41" title="2 of 4 branches missed.">        if (index &lt; 0 || index &gt;= levels.size()) {</span>
-<span class="nc" id="L42">            throw new IllegalArgumentException(&quot;Invalid level index.&quot;);</span>
+<span class="pc bpc" id="L45" title="2 of 4 branches missed.">        if (index &lt; 0 || index &gt;= levels.size()) {</span>
+<span class="nc" id="L46">            throw new IllegalArgumentException(&quot;Invalid level index.&quot;);</span>
         }
-<span class="fc" id="L44">        return levels.getJSONObject(index);</span>
+<span class="fc" id="L48">        return levels.getJSONObject(index);</span>
     }
 
-    // Method to get balls for a specific level
+    /** Method to get balls for a specific level
+     * @param levelIndex is used to know what level we are at
+     * @return balls it returns the balls that are to be spawned
+    */
     public List&lt;String&gt; getBalls(int levelIndex) {
-<span class="fc" id="L49">        JSONObject level = getLevel(levelIndex);</span>
-<span class="fc" id="L50">        JSONArray ballsArray = level.getJSONArray(&quot;balls&quot;);</span>
-<span class="fc" id="L51">        List&lt;String&gt; balls = new ArrayList&lt;&gt;();</span>
-<span class="fc bfc" id="L52" title="All 2 branches covered.">        for (int i = 0; i &lt; ballsArray.size(); i++) {</span>
-<span class="fc" id="L53">            balls.add(ballsArray.getString(i));</span>
+<span class="fc" id="L56">        JSONObject level = getLevel(levelIndex);</span>
+<span class="fc" id="L57">        JSONArray ballsArray = level.getJSONArray(&quot;balls&quot;);</span>
+<span class="fc" id="L58">        List&lt;String&gt; balls = new ArrayList&lt;&gt;();</span>
+<span class="fc bfc" id="L59" title="All 2 branches covered.">        for (int i = 0; i &lt; ballsArray.size(); i++) {</span>
+<span class="fc" id="L60">            balls.add(ballsArray.getString(i));</span>
         }
-<span class="fc" id="L55">        return balls;</span>
+<span class="fc" id="L62">        return balls;</span>
     }
 
-    // Method to get score increase based on ball color
+    /**
+     * Method to get score increase based on ball color.
+     * @param color color of the ball is taken to determine the score increase.
+     * @return tells i]us the score increased from hole capture.
+     */
     public int getScoreIncrease(String color) {
-<span class="nc" id="L60">        return scoreIncreaseFromHoleCapture.getOrDefault(color, 0);</span>
+<span class="nc" id="L71">        return scoreIncreaseFromHoleCapture.getOrDefault(color, 0);</span>
     }
 
-    // Method to get score decrease based on ball color
+    /**
+     * Method to get score decrease based on ball color
+     * @param color color of the ball is taken to determine the score decrease.
+     * @return tells us the score decreased from hole capture.
+     */
     public int getScoreDecrease(String color) {
-<span class="nc" id="L65">        return scoreDecreaseFromWrongHole.getOrDefault(color, 0);</span>
+<span class="nc" id="L80">        return scoreDecreaseFromWrongHole.getOrDefault(color, 0);</span>
     }
 
-    // Method to access other level-specific data
+    /**
+     * Method to access other level-specific data
+     * @param levelIndex is used to know what level we are at
+     * @return returns what layout needs to be used
+     */
     public String getLayout(int levelIndex) {
-<span class="fc" id="L70">        return getLevel(levelIndex).getString(&quot;layout&quot;);</span>
+<span class="fc" id="L89">        return getLevel(levelIndex).getString(&quot;layout&quot;);</span>
     }
 
+    /**
+     * Method to access level time
+     * @param levelIndex is used to know what level we are at
+     * @return the time the level should run for.
+     */
     public int getTime(int levelIndex) {
-<span class="fc" id="L74">        return getLevel(levelIndex).getInt(&quot;time&quot;);</span>
+<span class="fc" id="L98">        return getLevel(levelIndex).getInt(&quot;time&quot;);</span>
     }
 
+    /**
+     * Method to access spawn interval
+     * @param levelIndex is used to know what level we are at
+     * @return the spawn interval for the game.
+     */
     public int getSpawnInterval(int levelIndex) {
-<span class="fc" id="L78">        return getLevel(levelIndex).getInt(&quot;spawn_interval&quot;);</span>
+<span class="fc" id="L107">        return getLevel(levelIndex).getInt(&quot;spawn_interval&quot;);</span>
     }
 
+    /**
+     * Method to access score increase modifier
+     * @param levelIndex is used to know what level we are at
+     * @return the score increase modifier for the level.
+     */
     public float getScoreIncreaseModifier(int levelIndex) {
-<span class="fc" id="L82">        return getLevel(levelIndex).getFloat(&quot;score_increase_from_hole_capture_modifier&quot;);</span>
+<span class="fc" id="L116">        return getLevel(levelIndex).getFloat(&quot;score_increase_from_hole_capture_modifier&quot;);</span>
     }
 
+    /**
+     * Method to access score decrease modifier
+     * @param levelIndex is used to know what level we are at
+     * @return the score decrease modifier for the level.
+     */
     public float getScoreDecreaseModifier(int levelIndex) {
-<span class="fc" id="L86">        return getLevel(levelIndex).getFloat(&quot;score_decrease_from_wrong_hole_modifier&quot;);</span>
+<span class="fc" id="L125">        return getLevel(levelIndex).getFloat(&quot;score_decrease_from_wrong_hole_modifier&quot;);</span>
     }
 }
 </pre><div class="footer"><span class="right">Created with <a href="http://www.jacoco.org/jacoco">JaCoCo</a> 0.8.9.202303310957</span></div></body></html>

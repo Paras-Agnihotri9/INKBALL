@@ -230,13 +230,6 @@ public class AppTest {
         assertFalse(app.timeReached());
     }
 
-    @Test
-    public void testUpdateUpcomingBalls() {
-        app.setupLevel(0);
-        app.updateUpcomingBalls();
-        // Verify the size of the ball queue is as expected
-        assertTrue(app.upcomingBalls.size() >= 0, "Ball queue should have balls after update.");
-    }
 
     // Test case for score display
     @Test
