@@ -2,7 +2,7 @@
 
 public class Wall {
     private int x, y;
-    private char wallType; // X for regular, '1' to '4' for colored walls
+    private char wallType;
     String newColor;
 
     public Wall(int x, int y, char wallType) {
