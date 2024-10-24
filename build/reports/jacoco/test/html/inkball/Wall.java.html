@@ -5,89 +5,89 @@ public class Wall {
     private char wallType; // X for regular, '1' to '4' for colored walls
     String newColor;
 
-<span class="nc" id="L8">    public Wall(int x, int y, char wallType) {</span>
-<span class="nc" id="L9">        this.x = x;</span>
-<span class="nc" id="L10">        this.y = y;</span>
-<span class="nc" id="L11">        this.wallType = wallType;</span>
-<span class="nc" id="L12">    }</span>
+<span class="fc" id="L8">    public Wall(int x, int y, char wallType) {</span>
+<span class="fc" id="L9">        this.x = x;</span>
+<span class="fc" id="L10">        this.y = y;</span>
+<span class="fc" id="L11">        this.wallType = wallType;</span>
+<span class="fc" id="L12">    }</span>
 
     public char getWallType() {
-<span class="nc" id="L15">        return wallType;</span>
+<span class="fc" id="L15">        return wallType;</span>
     }
 
     public int getX() {
-<span class="nc" id="L19">        return x;</span>
+<span class="fc" id="L19">        return x;</span>
     }
 
     public int getY() {
-<span class="nc" id="L23">        return y;</span>
+<span class="fc" id="L23">        return y;</span>
     }
 
     // Calculate the ball center
     private float calculateBallCenterX(Ball ball) {
-<span class="nc" id="L28">        return ball.getX() + ball.getRadius();</span>
+<span class="fc" id="L28">        return ball.getX() + ball.getRadius();</span>
     }
 
     private float calculateBallCenterY(Ball ball) {
-<span class="nc" id="L32">        return ball.getY() + ball.getRadius();</span>
+<span class="fc" id="L32">        return ball.getY() + ball.getRadius();</span>
     }
 
     // Collision detection method
     public boolean isOverlapping(Ball ball) {
-<span class="nc" id="L37">        float ballCenterX = calculateBallCenterX(ball);</span>
-<span class="nc" id="L38">        float ballCenterY = calculateBallCenterY(ball);</span>
-<span class="nc" id="L39">        int ballRadius = ball.getRadius();</span>
+<span class="fc" id="L37">        float ballCenterX = calculateBallCenterX(ball);</span>
+<span class="fc" id="L38">        float ballCenterY = calculateBallCenterY(ball);</span>
+<span class="fc" id="L39">        int ballRadius = ball.getRadius();</span>
 
         // Wall coordinates
-<span class="nc" id="L42">        int wallLeft = x * App.CELLSIZE;</span>
-<span class="nc" id="L43">        int wallRight = wallLeft + App.CELLSIZE;</span>
-<span class="nc" id="L44">        int wallTop = y * App.CELLHEIGHT;</span>
-<span class="nc" id="L45">        int wallBottom = wallTop + App.CELLHEIGHT;</span>
+<span class="fc" id="L42">        int wallLeft = x * App.CELLSIZE;</span>
+<span class="fc" id="L43">        int wallRight = wallLeft + App.CELLSIZE;</span>
+<span class="fc" id="L44">        int wallTop = y * App.CELLHEIGHT;</span>
+<span class="fc" id="L45">        int wallBottom = wallTop + App.CELLHEIGHT;</span>
 
         // Check for overlap (AABB collision detection)
-<span class="nc bnc" id="L48" title="All 8 branches missed.">        boolean overlap = ballCenterX + ballRadius &gt; wallLeft &amp;&amp; ballCenterX - ballRadius &lt; wallRight &amp;&amp;</span>
+<span class="fc bfc" id="L48" title="All 8 branches covered.">        boolean overlap = ballCenterX + ballRadius &gt; wallLeft &amp;&amp; ballCenterX - ballRadius &lt; wallRight &amp;&amp;</span>
                           ballCenterY + ballRadius &gt; wallTop &amp;&amp; ballCenterY - ballRadius &lt; wallBottom;
 
-<span class="nc" id="L51">        return overlap;</span>
+<span class="fc" id="L51">        return overlap;</span>
     }
 
-<span class="nc" id="L54">    private int collisionBuffer = 0; // Add a buffer to handle repeated collisions</span>
+<span class="fc" id="L54">    private int collisionBuffer = 0; // Add a buffer to handle repeated collisions</span>
 
 public void handleCollision(Ball ball) {
-<span class="nc bnc" id="L57" title="All 2 branches missed.">    if (!isOverlapping(ball)) return;  // No collision detected</span>
+<span class="fc bfc" id="L57" title="All 2 branches covered.">    if (!isOverlapping(ball)) return;  // No collision detected</span>
 
-<span class="nc" id="L59">    float ballCenterX = calculateBallCenterX(ball);  // Get ball's center</span>
-<span class="nc" id="L60">    float ballCenterY = calculateBallCenterY(ball);</span>
-<span class="nc" id="L61">    int ballRadius = ball.getRadius();</span>
+<span class="fc" id="L59">    float ballCenterX = calculateBallCenterX(ball);  // Get ball's center</span>
+<span class="fc" id="L60">    float ballCenterY = calculateBallCenterY(ball);</span>
+<span class="fc" id="L61">    int ballRadius = ball.getRadius();</span>
 
     // Wall boundaries (assumed to be rectangular grid cells)
-<span class="nc" id="L64">    int wallLeft = x * App.CELLSIZE;</span>
-<span class="nc" id="L65">    int wallRight = wallLeft + App.CELLSIZE;</span>
-<span class="nc" id="L66">    int wallTop = y * App.CELLHEIGHT;</span>
-<span class="nc" id="L67">    int wallBottom = wallTop + App.CELLHEIGHT;</span>
+<span class="fc" id="L64">    int wallLeft = x * App.CELLSIZE;</span>
+<span class="fc" id="L65">    int wallRight = wallLeft + App.CELLSIZE;</span>
+<span class="fc" id="L66">    int wallTop = y * App.CELLHEIGHT;</span>
+<span class="fc" id="L67">    int wallBottom = wallTop + App.CELLHEIGHT;</span>
 
     // Calculate distances from ball edge to the wall edges
-<span class="nc" id="L70">    float distToLeft = (ballCenterX - ballRadius) - wallLeft;</span>
-<span class="nc" id="L71">    float distToRight = wallRight - (ballCenterX + ballRadius);</span>
-<span class="nc" id="L72">    float distToTop = (ballCenterY - ballRadius) - wallTop;</span>
-<span class="nc" id="L73">    float distToBottom = wallBottom - (ballCenterY + ballRadius);</span>
+<span class="fc" id="L70">    float distToLeft = (ballCenterX - ballRadius) - wallLeft;</span>
+<span class="fc" id="L71">    float distToRight = wallRight - (ballCenterX + ballRadius);</span>
+<span class="fc" id="L72">    float distToTop = (ballCenterY - ballRadius) - wallTop;</span>
+<span class="fc" id="L73">    float distToBottom = wallBottom - (ballCenterY + ballRadius);</span>
 
     // Find the closest side by checking the smallest distance
-<span class="nc" id="L76">    float minDistance = Math.min(Math.min(distToLeft, distToRight), Math.min(distToTop, distToBottom));</span>
+<span class="fc" id="L76">    float minDistance = Math.min(Math.min(distToLeft, distToRight), Math.min(distToTop, distToBottom));</span>
 
     // Reflect the ball based on the closest side and adjust its position
-<span class="nc bnc" id="L79" title="All 2 branches missed.">    if (minDistance == distToLeft) {</span>
+<span class="pc bpc" id="L79" title="1 of 2 branches missed.">    if (minDistance == distToLeft) {</span>
         // Ball hit the left side of the wall, reverse X direction
 <span class="nc" id="L81">        ball.reverseHorizontalDirection();</span>
 <span class="nc" id="L82">        ball.setX(wallLeft - 2 * ballRadius);  // Move ball just outside the left wall boundary</span>
-<span class="nc bnc" id="L83" title="All 2 branches missed.">    } else if (minDistance == distToRight) {</span>
+<span class="pc bpc" id="L83" title="1 of 2 branches missed.">    } else if (minDistance == distToRight) {</span>
         // Ball hit the right side of the wall, reverse X direction
 <span class="nc" id="L85">        ball.reverseHorizontalDirection();</span>
 <span class="nc" id="L86">        ball.setX(wallRight);  // Move ball just outside the right wall boundary</span>
-<span class="nc bnc" id="L87" title="All 2 branches missed.">    } else if (minDistance == distToTop) {</span>
+<span class="pc bpc" id="L87" title="1 of 2 branches missed.">    } else if (minDistance == distToTop) {</span>
         // Ball hit the top side of the wall, reverse Y direction
-<span class="nc" id="L89">        ball.reverseVerticalDirection();</span>
-<span class="nc" id="L90">        ball.setY(wallTop - 2 * ballRadius);  // Move ball just outside the top wall boundary</span>
+<span class="fc" id="L89">        ball.reverseVerticalDirection();</span>
+<span class="fc" id="L90">        ball.setY(wallTop - 2 * ballRadius);  // Move ball just outside the top wall boundary</span>
 <span class="nc bnc" id="L91" title="All 2 branches missed.">    } else if (minDistance == distToBottom) {</span>
         // Ball hit the bottom side of the wall, reverse Y direction
 <span class="nc" id="L93">        ball.reverseVerticalDirection();</span>
@@ -95,27 +95,21 @@ public void handleCollision(Ball ball) {
     }
 
     // Handle color change for colored walls
-<span class="nc bnc" id="L98" title="All 2 branches missed.">    if (Character.isDigit(wallType)) {</span>
+<span class="pc bpc" id="L98" title="1 of 2 branches missed.">    if (Character.isDigit(wallType)) {</span>
 <span class="nc" id="L99">        String newColor = getWallColor(wallType);</span>
 <span class="nc" id="L100">        ball.setColor(newColor);</span>
     }
-<span class="nc" id="L102">}</span>
-
-    public void updateCollisionBuffer() {
-<span class="nc bnc" id="L105" title="All 2 branches missed.">        if (collisionBuffer &gt; 0) {</span>
-<span class="nc" id="L106">            collisionBuffer--;</span>
-        }
-<span class="nc" id="L108">    }</span>
+<span class="fc" id="L102">}</span>
 
 
-    private String getWallColor(char wallTile) {
-<span class="nc bnc" id="L112" title="All 6 branches missed.">        switch (wallTile) {</span>
-<span class="nc" id="L113">            case 'X': return &quot;grey&quot;;</span>
-<span class="nc" id="L114">            case '1': return &quot;orange&quot;;</span>
-<span class="nc" id="L115">            case '2': return &quot;blue&quot;;</span>
-<span class="nc" id="L116">            case '3': return &quot;green&quot;;</span>
-<span class="nc" id="L117">            case '4': return &quot;yellow&quot;;</span>
-<span class="nc" id="L118">            default: return &quot;grey&quot;;</span>
+    public String getWallColor(char wallTile) {
+<span class="pc bpc" id="L106" title="5 of 6 branches missed.">        switch (wallTile) {</span>
+<span class="fc" id="L107">            case 'X': return &quot;grey&quot;;</span>
+<span class="nc" id="L108">            case '1': return &quot;orange&quot;;</span>
+<span class="nc" id="L109">            case '2': return &quot;blue&quot;;</span>
+<span class="nc" id="L110">            case '3': return &quot;green&quot;;</span>
+<span class="nc" id="L111">            case '4': return &quot;yellow&quot;;</span>
+<span class="nc" id="L112">            default: return &quot;grey&quot;;</span>
         }
     }
 }

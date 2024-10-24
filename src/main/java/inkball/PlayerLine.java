@@ -6,9 +6,9 @@ import processing.core.PApplet;
 import processing.core.PVector;
 
 public class PlayerLine {
-    private ArrayList<PVector> segments; // Store the line segments
-    private Color color;                 // Line color
-    private int thickness;               // Line thickness
+    public ArrayList<PVector> segments; // Store the line segments
+    public Color color;                 // Line color
+    public int thickness;               // Line thickness
     private boolean complete;
     
     public PlayerLine(Color color, int thickness) {
@@ -64,16 +64,16 @@ public class PlayerLine {
     }
 
 
-    private boolean isCollidingWithSegment(Ball ball, PVector p1, PVector p2) {
+    public boolean isCollidingWithSegment(Ball ball, PVector p1, PVector p2) {
         // Ball collision detection logic (as previously written)
         PVector ballPosition = new PVector(ball.getX() + ball.getRadius(), ball.getY() + ball.getRadius());
-        PVector ballVelocity = new PVector(ball.getVelocityX(), ball.getVelocityY());
+        PVector ballVelocity = new PVector(ball.velocityX, ball.velocityY);
         PVector predictedPosition = PVector.add(ballPosition, ballVelocity);
         float distanceToSegment = distToSegment(predictedPosition, p1, p2);
         return distanceToSegment <= ball.getRadius();
     }
 
-    private float distToSegment(PVector point, PVector p1, PVector p2) {
+    public float distToSegment(PVector point, PVector p1, PVector p2) {
         // Distance calculation logic (as previously written)
         float segmentLengthSquared = PApplet.dist(p1.x, p1.y, p2.x, p2.y) * PApplet.dist(p1.x, p1.y, p2.x, p2.y);
         if (segmentLengthSquared == 0) return PApplet.dist(point.x, point.y, p1.x, p1.y);
@@ -83,8 +83,8 @@ public class PlayerLine {
         return PApplet.dist(point.x, point.y, closestPoint.x, closestPoint.y);
     }
 
-    private void reflectBall(Ball ball, PVector p1, PVector p2) {
-        PVector ballVelocity = new PVector(ball.getVelocityX(), ball.getVelocityY());
+    public void reflectBall(Ball ball, PVector p1, PVector p2) {
+        PVector ballVelocity = new PVector(ball.velocityX, ball.velocityY);
         PVector normal = new PVector(-(p2.y - p1.y), p2.x - p1.x).normalize();
         
         float dotProduct = ballVelocity.dot(normal);

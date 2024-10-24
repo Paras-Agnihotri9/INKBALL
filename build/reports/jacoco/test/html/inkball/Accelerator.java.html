@@ -1,0 +1,61 @@
+<?xml version="1.0" encoding="UTF-8"?><!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd"><html xmlns="http://www.w3.org/1999/xhtml" lang="en"><head><meta http-equiv="Content-Type" content="text/html;charset=UTF-8"/><link rel="stylesheet" href="../jacoco-resources/report.css" type="text/css"/><link rel="shortcut icon" href="../jacoco-resources/report.gif" type="image/gif"/><title>Accelerator.java</title><link rel="stylesheet" href="../jacoco-resources/prettify.css" type="text/css"/><script type="text/javascript" src="../jacoco-resources/prettify.js"></script></head><body onload="window['PR_TAB_WIDTH']=4;prettyPrint()"><div class="breadcrumb" id="breadcrumb"><span class="info"><a href="../jacoco-sessions.html" class="el_session">Sessions</a></span><a href="../index.html" class="el_report">INKBALL</a> &gt; <a href="index.source.html" class="el_package">inkball</a> &gt; <span class="el_source">Accelerator.java</span></div><h1>Accelerator.java</h1><pre class="source lang-java linenums">package inkball;
+
+import processing.core.PApplet;
+import processing.core.PImage;
+
+public class Accelerator {
+    private int x, y;  // Position of the accelerator
+    private String type;  // &quot;top&quot;, &quot;bottom&quot;, &quot;left&quot;, or &quot;right&quot;
+    private PImage image;  // Image representing the accelerator
+
+    // Constructor to initialize position, type, and image
+<span class="fc" id="L12">    public Accelerator(int x, int y, String type, PImage image) {</span>
+<span class="fc" id="L13">        this.x = x;</span>
+<span class="fc" id="L14">        this.y = y;</span>
+<span class="fc" id="L15">        this.type = type;</span>
+<span class="fc" id="L16">        this.image = image;</span>
+<span class="fc" id="L17">    }</span>
+
+    // Function to display the accelerator on the game screen
+    public void display(PApplet app) {
+<span class="nc" id="L21">        app.image(image, x * App.CELLSIZE, y * App.CELLHEIGHT, App.CELLSIZE, App.CELLHEIGHT);</span>
+<span class="nc" id="L22">    }</span>
+
+    // Function to accelerate the ball when it comes over the accelerator
+    public void applyAcceleration(Ball ball) {
+<span class="nc bnc" id="L26" title="All 2 branches missed.">        if (isOverlapping(ball)) {</span>
+<span class="nc bnc" id="L27" title="All 5 branches missed.">            switch (type) {</span>
+                case &quot;top&quot;:
+<span class="nc" id="L29">                    ball.applyForce(0, -0.5f);  // Increase upward velocity</span>
+<span class="nc" id="L30">                    break;</span>
+                case &quot;bottom&quot;:
+<span class="nc" id="L32">                    ball.applyForce(0, 0.5f);  // Increase downward velocity</span>
+<span class="nc" id="L33">                    break;</span>
+                case &quot;left&quot;:
+<span class="nc" id="L35">                    ball.applyForce(-0.5f, 0);  // Increase leftward velocity</span>
+<span class="nc" id="L36">                    break;</span>
+                case &quot;right&quot;:
+<span class="nc" id="L38">                    ball.applyForce(0.5f, 0);  // Increase rightward velocity</span>
+                    break;
+            }
+        }
+<span class="nc" id="L42">    }</span>
+
+    // Check if the ball overlaps with the accelerator (basic AABB collision detection)
+    private boolean isOverlapping(Ball ball) {
+<span class="nc" id="L46">        float ballCenterX = ball.getX() + ball.getRadius();</span>
+<span class="nc" id="L47">        float ballCenterY = ball.getY() + ball.getRadius();</span>
+<span class="nc" id="L48">        int ballRadius = ball.getRadius();</span>
+
+        // Accelerator boundaries
+<span class="nc" id="L51">        int accelLeft = x * App.CELLSIZE;</span>
+<span class="nc" id="L52">        int accelRight = accelLeft + App.CELLSIZE;</span>
+<span class="nc" id="L53">        int accelTop = y * App.CELLHEIGHT;</span>
+<span class="nc" id="L54">        int accelBottom = accelTop + App.CELLHEIGHT;</span>
+
+        // Check if ball is overlapping with the accelerator
+<span class="nc bnc" id="L57" title="All 8 branches missed.">        return ballCenterX&gt; accelLeft &amp;&amp; ballCenterX &lt; accelRight &amp;&amp;</span>
+               ballCenterY&gt; accelTop &amp;&amp; ballCenterY&lt; accelBottom;
+    }
+}
+</pre><div class="footer"><span class="right">Created with <a href="http://www.jacoco.org/jacoco">JaCoCo</a> 0.8.9.202303310957</span></div></body></html>

@@ -101,14 +101,8 @@ public void handleCollision(Ball ball) {
     }
 }
 
-    public void updateCollisionBuffer() {
-        if (collisionBuffer > 0) {
-            collisionBuffer--;
-        }
-    }
 
-
-    private String getWallColor(char wallTile) {
+    public String getWallColor(char wallTile) {
         switch (wallTile) {
             case 'X': return "grey";
             case '1': return "orange";

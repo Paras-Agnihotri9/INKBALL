@@ -1,0 +1,359 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<testsuite name="inkball.PlayerLineTest" tests="8" skipped="0" failures="1" errors="0" timestamp="2024-10-24T13:43:36" hostname="parass-mbp.shared.sydney.edu.au" time="0.31">
+  <properties/>
+  <testcase name="testAddSegment()" classname="inkball.PlayerLineTest" time="0.042"/>
+  <testcase name="testReflectBall()" classname="inkball.PlayerLineTest" time="0.035">
+    <failure message="org.opentest4j.AssertionFailedError: expected: &lt;true&gt; but was: &lt;false&gt;" type="org.opentest4j.AssertionFailedError">org.opentest4j.AssertionFailedError: expected: &lt;true&gt; but was: &lt;false&gt;
+	at org.junit.jupiter.api.AssertionUtils.fail(AssertionUtils.java:55)
+	at org.junit.jupiter.api.AssertTrue.assertTrue(AssertTrue.java:40)
+	at org.junit.jupiter.api.AssertTrue.assertTrue(AssertTrue.java:35)
+	at org.junit.jupiter.api.Assertions.assertTrue(Assertions.java:162)
+	at inkball.PlayerLineTest.testReflectBall(PlayerLineTest.java:99)
+	at sun.reflect.NativeMethodAccessorImpl.invoke0(Native Method)
+	at sun.reflect.NativeMethodAccessorImpl.invoke(NativeMethodAccessorImpl.java:62)
+	at sun.reflect.DelegatingMethodAccessorImpl.invoke(DelegatingMethodAccessorImpl.java:43)
+	at java.lang.reflect.Method.invoke(Method.java:498)
+	at org.junit.platform.commons.util.ReflectionUtils.invokeMethod(ReflectionUtils.java:686)
+	at org.junit.jupiter.engine.execution.MethodInvocation.proceed(MethodInvocation.java:60)
+	at org.junit.jupiter.engine.execution.InvocationInterceptorChain$ValidatingInvocation.proceed(InvocationInterceptorChain.java:131)
+	at org.junit.jupiter.engine.extension.TimeoutExtension.intercept(TimeoutExtension.java:149)
+	at org.junit.jupiter.engine.extension.TimeoutExtension.interceptTestableMethod(TimeoutExtension.java:140)
+	at org.junit.jupiter.engine.extension.TimeoutExtension.interceptTestMethod(TimeoutExtension.java:84)
+	at org.junit.jupiter.engine.execution.ExecutableInvoker$ReflectiveInterceptorCall.lambda$ofVoidMethod$0(ExecutableInvoker.java:115)
+	at org.junit.jupiter.engine.execution.ExecutableInvoker.lambda$invoke$0(ExecutableInvoker.java:105)
+	at org.junit.jupiter.engine.execution.InvocationInterceptorChain$InterceptedInvocation.proceed(InvocationInterceptorChain.java:106)
+	at org.junit.jupiter.engine.execution.InvocationInterceptorChain.proceed(InvocationInterceptorChain.java:64)
+	at org.junit.jupiter.engine.execution.InvocationInterceptorChain.chainAndInvoke(InvocationInterceptorChain.java:45)
+	at org.junit.jupiter.engine.execution.InvocationInterceptorChain.invoke(InvocationInterceptorChain.java:37)
+	at org.junit.jupiter.engine.execution.ExecutableInvoker.invoke(ExecutableInvoker.java:104)
+	at org.junit.jupiter.engine.execution.ExecutableInvoker.invoke(ExecutableInvoker.java:98)
+	at org.junit.jupiter.engine.descriptor.TestMethodTestDescriptor.lambda$invokeTestMethod$6(TestMethodTestDescriptor.java:212)
+	at org.junit.platform.engine.support.hierarchical.ThrowableCollector.execute(ThrowableCollector.java:73)
+	at org.junit.jupiter.engine.descriptor.TestMethodTestDescriptor.invokeTestMethod(TestMethodTestDescriptor.java:208)
+	at org.junit.jupiter.engine.descriptor.TestMethodTestDescriptor.execute(TestMethodTestDescriptor.java:137)
+	at org.junit.jupiter.engine.descriptor.TestMethodTestDescriptor.execute(TestMethodTestDescriptor.java:71)
+	at org.junit.platform.engine.support.hierarchical.NodeTestTask.lambda$executeRecursively$5(NodeTestTask.java:135)
+	at org.junit.platform.engine.support.hierarchical.ThrowableCollector.execute(ThrowableCollector.java:73)
+	at org.junit.platform.engine.support.hierarchical.NodeTestTask.lambda$executeRecursively$7(NodeTestTask.java:125)
+	at org.junit.platform.engine.support.hierarchical.Node.around(Node.java:135)
+	at org.junit.platform.engine.support.hierarchical.NodeTestTask.lambda$executeRecursively$8(NodeTestTask.java:123)
+	at org.junit.platform.engine.support.hierarchical.ThrowableCollector.execute(ThrowableCollector.java:73)
+	at org.junit.platform.engine.support.hierarchical.NodeTestTask.executeRecursively(NodeTestTask.java:122)
+	at org.junit.platform.engine.support.hierarchical.NodeTestTask.execute(NodeTestTask.java:80)
+	at java.util.ArrayList.forEach(ArrayList.java:1259)
+	at org.junit.platform.engine.support.hierarchical.SameThreadHierarchicalTestExecutorService.invokeAll(SameThreadHierarchicalTestExecutorService.java:38)
+	at org.junit.platform.engine.support.hierarchical.NodeTestTask.lambda$executeRecursively$5(NodeTestTask.java:139)
+	at org.junit.platform.engine.support.hierarchical.ThrowableCollector.execute(ThrowableCollector.java:73)
+	at org.junit.platform.engine.support.hierarchical.NodeTestTask.lambda$executeRecursively$7(NodeTestTask.java:125)
+	at org.junit.platform.engine.support.hierarchical.Node.around(Node.java:135)
+	at org.junit.platform.engine.support.hierarchical.NodeTestTask.lambda$executeRecursively$8(NodeTestTask.java:123)
+	at org.junit.platform.engine.support.hierarchical.ThrowableCollector.execute(ThrowableCollector.java:73)
+	at org.junit.platform.engine.support.hierarchical.NodeTestTask.executeRecursively(NodeTestTask.java:122)
+	at org.junit.platform.engine.support.hierarchical.NodeTestTask.execute(NodeTestTask.java:80)
+	at java.util.ArrayList.forEach(ArrayList.java:1259)
+	at org.junit.platform.engine.support.hierarchical.SameThreadHierarchicalTestExecutorService.invokeAll(SameThreadHierarchicalTestExecutorService.java:38)
+	at org.junit.platform.engine.support.hierarchical.NodeTestTask.lambda$executeRecursively$5(NodeTestTask.java:139)
+	at org.junit.platform.engine.support.hierarchical.ThrowableCollector.execute(ThrowableCollector.java:73)
+	at org.junit.platform.engine.support.hierarchical.NodeTestTask.lambda$executeRecursively$7(NodeTestTask.java:125)
+	at org.junit.platform.engine.support.hierarchical.Node.around(Node.java:135)
+	at org.junit.platform.engine.support.hierarchical.NodeTestTask.lambda$executeRecursively$8(NodeTestTask.java:123)
+	at org.junit.platform.engine.support.hierarchical.ThrowableCollector.execute(ThrowableCollector.java:73)
+	at org.junit.platform.engine.support.hierarchical.NodeTestTask.executeRecursively(NodeTestTask.java:122)
+	at org.junit.platform.engine.support.hierarchical.NodeTestTask.execute(NodeTestTask.java:80)
+	at org.junit.platform.engine.support.hierarchical.SameThreadHierarchicalTestExecutorService.submit(SameThreadHierarchicalTestExecutorService.java:32)
+	at org.junit.platform.engine.support.hierarchical.HierarchicalTestExecutor.execute(HierarchicalTestExecutor.java:57)
+	at org.junit.platform.engine.support.hierarchical.HierarchicalTestEngine.execute(HierarchicalTestEngine.java:51)
+	at org.junit.platform.launcher.core.EngineExecutionOrchestrator.execute(EngineExecutionOrchestrator.java:107)
+	at org.junit.platform.launcher.core.EngineExecutionOrchestrator.execute(EngineExecutionOrchestrator.java:88)
+	at org.junit.platform.launcher.core.EngineExecutionOrchestrator.lambda$execute$0(EngineExecutionOrchestrator.java:54)
+	at org.junit.platform.launcher.core.EngineExecutionOrchestrator.withInterceptedStreams(EngineExecutionOrchestrator.java:67)
+	at org.junit.platform.launcher.core.EngineExecutionOrchestrator.execute(EngineExecutionOrchestrator.java:52)
+	at org.junit.platform.launcher.core.DefaultLauncher.execute(DefaultLauncher.java:114)
+	at org.junit.platform.launcher.core.DefaultLauncher.execute(DefaultLauncher.java:86)
+	at org.junit.platform.launcher.core.DefaultLauncherSession$DelegatingLauncher.execute(DefaultLauncherSession.java:86)
+	at org.gradle.api.internal.tasks.testing.junitplatform.JUnitPlatformTestClassProcessor$CollectAllTestClassesExecutor.processAllTestClasses(JUnitPlatformTestClassProcessor.java:110)
+	at org.gradle.api.internal.tasks.testing.junitplatform.JUnitPlatformTestClassProcessor$CollectAllTestClassesExecutor.access$000(JUnitPlatformTestClassProcessor.java:90)
+	at org.gradle.api.internal.tasks.testing.junitplatform.JUnitPlatformTestClassProcessor.stop(JUnitPlatformTestClassProcessor.java:85)
+	at org.gradle.api.internal.tasks.testing.SuiteTestClassProcessor.stop(SuiteTestClassProcessor.java:62)
+	at sun.reflect.NativeMethodAccessorImpl.invoke0(Native Method)
+	at sun.reflect.NativeMethodAccessorImpl.invoke(NativeMethodAccessorImpl.java:62)
+	at sun.reflect.DelegatingMethodAccessorImpl.invoke(DelegatingMethodAccessorImpl.java:43)
+	at java.lang.reflect.Method.invoke(Method.java:498)
+	at org.gradle.internal.dispatch.ReflectionDispatch.dispatch(ReflectionDispatch.java:36)
+	at org.gradle.internal.dispatch.ReflectionDispatch.dispatch(ReflectionDispatch.java:24)
+	at org.gradle.internal.dispatch.ContextClassLoaderDispatch.dispatch(ContextClassLoaderDispatch.java:33)
+	at org.gradle.internal.dispatch.ProxyDispatchAdapter$DispatchingInvocationHandler.invoke(ProxyDispatchAdapter.java:94)
+	at com.sun.proxy.$Proxy2.stop(Unknown Source)
+	at org.gradle.api.internal.tasks.testing.worker.TestWorker$3.run(TestWorker.java:193)
+	at org.gradle.api.internal.tasks.testing.worker.TestWorker.executeAndMaintainThreadName(TestWorker.java:129)
+	at org.gradle.api.internal.tasks.testing.worker.TestWorker.execute(TestWorker.java:100)
+	at org.gradle.api.internal.tasks.testing.worker.TestWorker.execute(TestWorker.java:60)
+	at org.gradle.process.internal.worker.child.ActionExecutionWorker.execute(ActionExecutionWorker.java:56)
+	at org.gradle.process.internal.worker.child.SystemApplicationClassLoaderWorker.call(SystemApplicationClassLoaderWorker.java:113)
+	at org.gradle.process.internal.worker.child.SystemApplicationClassLoaderWorker.call(SystemApplicationClassLoaderWorker.java:65)
+	at worker.org.gradle.process.internal.worker.GradleWorkerMain.run(GradleWorkerMain.java:69)
+	at worker.org.gradle.process.internal.worker.GradleWorkerMain.main(GradleWorkerMain.java:74)
+</failure>
+  </testcase>
+  <testcase name="testCheckCollisionWithBall()" classname="inkball.PlayerLineTest" time="0.039"/>
+  <testcase name="testIsCompleteInitially()" classname="inkball.PlayerLineTest" time="0.041"/>
+  <testcase name="testSetComplete()" classname="inkball.PlayerLineTest" time="0.041"/>
+  <testcase name="testInitialization()" classname="inkball.PlayerLineTest" time="0.034"/>
+  <testcase name="testDisplay()" classname="inkball.PlayerLineTest" time="0.042"/>
+  <testcase name="testIntersects()" classname="inkball.PlayerLineTest" time="0.031"/>
+  <system-out><![CDATA[Failed to load the board
+New wall added 4at17 0
+New wall added 4at1 1
+ x 8 y 1 type: 1
+New wall added 4at16 1
+New wall added 4at2 2
+New wall added 4at15 2
+New wall added 4at3 3
+New wall added 4at14 3
+New wall added 4at4 4
+New wall added 4at13 4
+New wall added 4at5 5
+New wall added 4at12 5
+ x 15 y 7 type: 0
+New wall added 4at5 12
+New wall added 4at12 12
+New wall added 4at4 13
+New wall added 4at13 13
+New wall added 4at3 14
+New wall added 4at14 14
+New wall added 4at2 15
+ x 9 y 15 type: 2
+New wall added 4at15 15
+New wall added 4at1 16
+New wall added 4at16 16
+New wall added 4at17 17
+VelocityX1.0
+VelocityY1.0
+Spawning ball of type orange at 96, 288
+Spawning ball of type blue at 448, 384
+[green, grey, grey, blue, yellow, orange, blue, grey]
+[green, grey, grey, blue, yellow, orange, blue, grey]
+Failed to load the board
+New wall added 4at17 0
+New wall added 4at1 1
+ x 8 y 1 type: 1
+New wall added 4at16 1
+New wall added 4at2 2
+New wall added 4at15 2
+New wall added 4at3 3
+New wall added 4at14 3
+New wall added 4at4 4
+New wall added 4at13 4
+New wall added 4at5 5
+New wall added 4at12 5
+ x 15 y 7 type: 0
+New wall added 4at5 12
+New wall added 4at12 12
+New wall added 4at4 13
+New wall added 4at13 13
+New wall added 4at3 14
+New wall added 4at14 14
+New wall added 4at2 15
+ x 9 y 15 type: 2
+New wall added 4at15 15
+New wall added 4at1 16
+New wall added 4at16 16
+New wall added 4at17 17
+[green, grey, grey, blue, yellow, orange, blue, grey]
+[green, grey, grey, blue, yellow, orange, blue, grey]
+Spawning ball of type orange at 96, 288
+Spawning ball of type blue at 448, 384
+[green, grey, grey, blue, yellow, orange, blue, grey]
+[green, grey, grey, blue, yellow, orange, blue, grey]
+Collision detected with segment: 0
+VelocityX2.0
+VelocityY2.0
+Failed to load the board
+New wall added 4at17 0
+New wall added 4at1 1
+ x 8 y 1 type: 1
+New wall added 4at16 1
+New wall added 4at2 2
+New wall added 4at15 2
+New wall added 4at3 3
+New wall added 4at14 3
+New wall added 4at4 4
+New wall added 4at13 4
+New wall added 4at5 5
+New wall added 4at12 5
+ x 15 y 7 type: 0
+New wall added 4at5 12
+New wall added 4at12 12
+New wall added 4at4 13
+New wall added 4at13 13
+New wall added 4at3 14
+New wall added 4at14 14
+New wall added 4at2 15
+ x 9 y 15 type: 2
+New wall added 4at15 15
+New wall added 4at1 16
+New wall added 4at16 16
+New wall added 4at17 17
+[green, grey, grey, blue, yellow, orange, blue, grey]
+[green, grey, grey, blue, yellow, orange, blue, grey]
+[green, grey, grey, blue, yellow, orange, blue, grey]
+[green, grey, grey, blue, yellow, orange, blue, grey]
+Spawning ball of type orange at 96, 288
+Spawning ball of type blue at 448, 384
+[green, grey, grey, blue, yellow, orange, blue, grey]
+[green, grey, grey, blue, yellow, orange, blue, grey]
+Failed to load the board
+New wall added 4at17 0
+New wall added 4at1 1
+ x 8 y 1 type: 1
+New wall added 4at16 1
+New wall added 4at2 2
+New wall added 4at15 2
+New wall added 4at3 3
+New wall added 4at14 3
+New wall added 4at4 4
+New wall added 4at13 4
+New wall added 4at5 5
+New wall added 4at12 5
+ x 15 y 7 type: 0
+New wall added 4at5 12
+New wall added 4at12 12
+New wall added 4at4 13
+New wall added 4at13 13
+New wall added 4at3 14
+New wall added 4at14 14
+New wall added 4at2 15
+ x 9 y 15 type: 2
+New wall added 4at15 15
+New wall added 4at1 16
+New wall added 4at16 16
+New wall added 4at17 17
+[green, grey, grey, blue, yellow, orange, blue, grey]
+[green, grey, grey, blue, yellow, orange, blue, grey]
+[green, grey, grey, blue, yellow, orange, blue, grey]
+[green, grey, grey, blue, yellow, orange, blue, grey]
+[green, grey, grey, blue, yellow, orange, blue, grey]
+[green, grey, grey, blue, yellow, orange, blue, grey]
+Spawning ball of type orange at 96, 288
+Spawning ball of type blue at 448, 384
+[green, grey, grey, blue, yellow, orange, blue, grey]
+[green, grey, grey, blue, yellow, orange, blue, grey]
+Failed to load the board
+New wall added 4at17 0
+New wall added 4at1 1
+ x 8 y 1 type: 1
+New wall added 4at16 1
+New wall added 4at2 2
+New wall added 4at15 2
+New wall added 4at3 3
+New wall added 4at14 3
+New wall added 4at4 4
+New wall added 4at13 4
+New wall added 4at5 5
+New wall added 4at12 5
+ x 15 y 7 type: 0
+New wall added 4at5 12
+New wall added 4at12 12
+New wall added 4at4 13
+New wall added 4at13 13
+New wall added 4at3 14
+New wall added 4at14 14
+New wall added 4at2 15
+ x 9 y 15 type: 2
+New wall added 4at15 15
+New wall added 4at1 16
+New wall added 4at16 16
+New wall added 4at17 17
+[green, grey, grey, blue, yellow, orange, blue, grey]
+[green, grey, grey, blue, yellow, orange, blue, grey]
+[green, grey, grey, blue, yellow, orange, blue, grey]
+[green, grey, grey, blue, yellow, orange, blue, grey]
+[green, grey, grey, blue, yellow, orange, blue, grey]
+[green, grey, grey, blue, yellow, orange, blue, grey]
+[green, grey, grey, blue, yellow, orange, blue, grey]
+[green, grey, grey, blue, yellow, orange, blue, grey]
+Spawning ball of type orange at 96, 288
+Spawning ball of type blue at 448, 384
+[green, grey, grey, blue, yellow, orange, blue, grey]
+[green, grey, grey, blue, yellow, orange, blue, grey]
+[green, grey, grey, blue, yellow, orange, blue, grey]
+[green, grey, grey, blue, yellow, orange, blue, grey]
+[green, grey, grey, blue, yellow, orange, blue, grey]
+Failed to load the board
+[green, grey, grey, blue, yellow, orange, blue, grey]
+New wall added 4at17 0
+New wall added 4at1 1
+ x 8 y 1 type: 1
+New wall added 4at16 1
+New wall added 4at2 2
+New wall added 4at15 2
+New wall added 4at3 3
+New wall added 4at14 3
+New wall added 4at4 4
+New wall added 4at13 4
+New wall added 4at5 5
+New wall added 4at12 5
+ x 15 y 7 type: 0
+New wall added 4at5 12
+New wall added 4at12 12
+New wall added 4at4 13
+New wall added 4at13 13
+New wall added 4at3 14
+New wall added 4at14 14
+New wall added 4at2 15
+ x 9 y 15 type: 2
+New wall added 4at15 15
+New wall added 4at1 16
+New wall added 4at16 16
+New wall added 4at17 17
+[green, grey, grey, blue, yellow, orange, blue, grey]
+[green, grey, grey, blue, yellow, orange, blue, grey]
+[green, grey, grey, blue, yellow, orange, blue, grey]
+[green, grey, grey, blue, yellow, orange, blue, grey]
+Spawning ball of type orange at 96, 288
+Spawning ball of type blue at 448, 384
+[green, grey, grey, blue, yellow, orange, blue, grey]
+[green, grey, grey, blue, yellow, orange, blue, grey]
+[green, grey, grey, blue, yellow, orange, blue, grey]
+[green, grey, grey, blue, yellow, orange, blue, grey]
+[green, grey, grey, blue, yellow, orange, blue, grey]
+[green, grey, grey, blue, yellow, orange, blue, grey]
+[green, grey, grey, blue, yellow, orange, blue, grey]
+[green, grey, grey, blue, yellow, orange, blue, grey]
+Failed to load the board
+New wall added 4at17 0
+New wall added 4at1 1
+ x 8 y 1 type: 1
+New wall added 4at16 1
+New wall added 4at2 2
+New wall added 4at15 2
+New wall added 4at3 3
+New wall added 4at14 3
+New wall added 4at4 4
+New wall added 4at13 4
+New wall added 4at5 5
+New wall added 4at12 5
+ x 15 y 7 type: 0
+New wall added 4at5 12
+New wall added 4at12 12
+New wall added 4at4 13
+New wall added 4at13 13
+New wall added 4at3 14
+New wall added 4at14 14
+New wall added 4at2 15
+ x 9 y 15 type: 2
+New wall added 4at15 15
+New wall added 4at1 16
+New wall added 4at16 16
+New wall added 4at17 17
+[green, grey, grey, blue, yellow, orange, blue, grey]
+[green, grey, grey, blue, yellow, orange, blue, grey]
+[green, grey, grey, blue, yellow, orange, blue, grey]
+[green, grey, grey, blue, yellow, orange, blue, grey]
+[green, grey, grey, blue, yellow, orange, blue, grey]
+[green, grey, grey, blue, yellow, orange, blue, grey]
+[green, grey, grey, blue, yellow, orange, blue, grey]
+[green, grey, grey, blue, yellow, orange, blue, grey]
+]]></system-out>
+  <system-err><![CDATA[]]></system-err>
+</testsuite>

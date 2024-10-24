@@ -1,7 +1,7 @@
 XXXXXXX2222XXXXXXX
 X              H0X
 X                X
-X                X
+X   E        W   X
 X                X
 X                X
 X    XX   XH1    X
@@ -11,7 +11,7 @@ X     X XX H2    X
 X    XX   X      X
 X                X
 X                X
-X     B2         X
+X   R B2      Q  X
 X                X
 X              H0X
 X                X

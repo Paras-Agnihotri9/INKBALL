@@ -43,11 +43,11 @@ public class App extends PApplet {
 
     public boolean flag = true;
 
-    private PlayerLine currentLine; // Current line being drawn
+    public PlayerLine currentLine; 
 
-    private ArrayList<PlayerLine> playerLines; // All player-drawn lines
+    public ArrayList<PlayerLine> playerLines; // All player-drawn lines
 
-    private boolean isEnded = false;
+    public boolean isEnded = false;
 
     private int yellowTile1X = 0;  // Top left corner
     private int yellowTile1Y = 0;  // Top left corner
@@ -57,7 +57,7 @@ public class App extends PApplet {
     public boolean levelCompleted = false;
     List<int[]> spawners;
 
-    int time;
+    long time;
     int spawnInterval;
     String layout;
     List<String> ballsToSpawn;
@@ -67,7 +67,8 @@ public class App extends PApplet {
     List<Ball> activeBalls; // List to hold active balls
     List<Wall> wallsList;
     List<Hole> holesList;
-    int startTime;
+    List<Accelerator> acceleratorList;
+    long startTime;
     public static int currentLevelIndex = 0;
     boolean isPaused = false;  // Flag to track whether the game is paused
    
@@ -79,27 +80,12 @@ public class App extends PApplet {
     int numDisplayedBalls = 0; // Number of balls currently displayed
     double slidingSpeed = 0.5; // Speed of the sliding animation
     int ballDisplaySize = 32; // Size of the ball images
-	// Feel free to add any additional methods or attributes you want. Please put classes in different files.
-
-    public App() {
-        this.configPath = "config.json";
-    }
-
-    /**
-     * Initialise the setting of the window size.
-     */
-	@Override
-    public void settings() {
-        size(WIDTH, HEIGHT);
-    }
-    
-    /**
-     * Load all resources such as images. Initialise the elements such as the player and map elements.
-     */
-
-   
     PImage tile;
     PImage spawner;
+    PImage E;
+    PImage Q;
+    PImage W;
+    PImage R;
     PImage[] walls;
     public PImage[] balls;
     public PImage[] holes;
@@ -116,17 +102,27 @@ public class App extends PApplet {
         ballColorMap.put("B4", "yellow");
         // Add more mappings if necessary
     }
+
+	// Feel free to add any additional methods or attributes you want. Please put classes in different files.
+
+    public App() {
+        this.configPath = "config.json";
+    }
+
+    /**
+     * Initialise the setting of the window size.
+     */
+	@Override
+    public void settings() {
+        size(WIDTH, HEIGHT);
+    }
+    
+     /**
+     * Load all resources such as images. Initialise the elements such as the player and map elements.
+     */
 	@Override
     public void setup() {
         frameRate(FPS);
-		//See PApplet javadoc:
-		//loadJSONObject(configPath)
-		// the image is loaded from relative path: "src/main/resources/inkball/..."
-		/*try {
-            result = loadImage(URLDecoder.decode(this.getClass().getResource(filename+".png").getPath(), StandardCharsets.UTF_8.name()));
-        } catch (UnsupportedEncodingException e) {
-            throw new RuntimeException(e);
-        }*/
         occupied =  new boolean[BOARD_WIDTH][BOARD_HEIGHT];
         occupiedBall = new boolean[BOARD_WIDTH][BOARD_HEIGHT];
         playerLines = new ArrayList<>();
@@ -138,6 +134,7 @@ public class App extends PApplet {
         upcomingBalls = new ArrayList<>();
         activeBalls = new ArrayList<>();
         wallsList = new ArrayList<>();
+        acceleratorList = new ArrayList<>();
 
         // Load images for walls
         walls = new PImage[5];
@@ -164,7 +161,10 @@ public class App extends PApplet {
         // Load other images
         tile = loadImage("src/main/resources/inkball/tile.png");
         spawner = loadImage("src/main/resources/inkball/entrypoint.png");
-
+        E = loadImage("src/main/resources/inkball/E.png");
+        Q = loadImage("src/main/resources/inkball/Q.png");
+        W = loadImage("src/main/resources/inkball/W.png");
+        R = loadImage("src/main/resources/inkball/R.png");
         initializeBallColorMap();
         if (board == null) {
             println("Failed to load the board");
@@ -184,12 +184,14 @@ public class App extends PApplet {
         }
 
     /**
-     * Receive key pressed signal from the keyboard.
+     * Takes in the level index, sets up Configuration data and game variables, also loads the level using the layou address
+     * @param levelIndex
      */
-    private void setupLevel(int levelIndex) {
+    public void setupLevel(int levelIndex) {
         // Call restartLevel to reset everything except the score
         if (levelCompleted == true){
-            restartLevel();
+            newLevel();
+            acceleratorList.clear();
         }
 
         // Now initialize the new level based on the levelIndex
@@ -203,29 +205,33 @@ public class App extends PApplet {
         
         // Reset the spawn interval counter for this new level
         this.spawnIntervalCounter = this.spawnInterval * FPS;
-
         // Load the new level layout
         loadLevel(layout);
     }
 
+    /**
+     * Initiallizes Ball position for the top display board
+     */
     public void initializeBallPositions() {
         for (int i = 0; i < maxDisplayBalls; i++) {
             ballXPositions[i] = i * (ballDisplaySize + 10); // Initial positions of the balls
         }
     }
-    private boolean checkLevelCompletion() {
-        if (allBallsAbsorbed() && currentLevelIndex <2) {
+
+    /**
+     */
+    public boolean checkLevelCompletion() {
+
+        if(ballsToSpawn.isEmpty() && activeBalls.isEmpty()){
+            if (currentLevelIndex <2) {
             currentLevelIndex++; // Move to the next level
             levelCompleted = true;
             long elapsedTime = (millis() - startTime) / 1000;
             score += ((time-elapsedTime)*0.067* scoreIncreaseModifier);      
             return true;
-        } else if (timeReached()) {
-            // Stop displaying timer and score
-            isEnded = true;
-            return true;
-        }
-        if (allBallsAbsorbed() && currentLevelIndex ==2 ){
+            }
+
+            else if(currentLevelIndex ==2 ){
             levelCompleted = true;
             fill(0); 
             textAlign(CENTER);
@@ -233,31 +239,41 @@ public class App extends PApplet {
             text(" === ENDED === ", width / 2, 30);
             return true;
         }
+        }
+         else if (timeReached()) {
+            // Stop displaying timer and score
+            isEnded = true;
+            return true;
+        }
+        
         return false;
     }
 
-    private void restartLevel() {
+    public void newLevel() {
         // Clear all game objects and reset variables, except for the score
         playerLines.clear();
         holesList.clear();
         wallsList.clear();
         activeBalls.clear();
         ballsToSpawn.clear();
-
         // Reset flags and counters
         spawnIntervalCounter = spawnInterval * FPS;
         levelCompleted = false; // Reset level completed flag
         startTime = millis(); // Reset the level start time
 
+
+        ballXPositions = new float[maxDisplayBalls];  // Reset ball positions
+        // Notify that the list of upcoming balls has changed
+        onBallListChange();
+        initializeBallPositions();
+        // Set levelCompleted flag to false
+        levelCompleted = false;
         // Reset other necessary flags or objects
         resetOccupied();
+        resetOccupiedBall();
     }
 
-    private boolean allBallsAbsorbed() {
-        return ballsToSpawn.isEmpty() && activeBalls.isEmpty();
-    }
-
-    private boolean timeReached() {
+    public boolean timeReached() {
         long elapsedTime = (millis() - startTime) / 1000; // Calculate elapsed time in seconds
         return elapsedTime >= time;
     }
@@ -284,20 +300,27 @@ public class App extends PApplet {
         // Reset timer
 
         // Reset balls and other game objects
-        ballsToSpawn.clear();  // Clear the ball list
-        activeBalls.clear();   // Clear active balls
-        playerLines.clear();   // Clear player-drawn lines
+        playerLines.clear();
+        holesList.clear();
+        wallsList.clear();
+        activeBalls.clear();
+        ballsToSpawn.clear();  // Clear player-drawn lines
         isEnded = false;
+        levelCompleted = false;
         // Reset the score to the pre-level state (assuming you store it)
         score = 0;
         startTime = millis();
         // Reinitialize the level to its initial state
         setupLevel(currentLevelIndex);
-
-        // Reset the ball positions for upcoming balls
+        ballXPositions = new float[maxDisplayBalls];  // Reset ball positions
+        // Notify that the list of upcoming balls has changed
+        onBallListChange();
         initializeBallPositions();
-
-        println("Level restarted!");
+        // Set levelCompleted flag to false
+        levelCompleted = false;
+        // Reset other necessary flags or objects
+        resetOccupied();
+        resetOccupiedBall();
     }
 
     public void togglePause() {
@@ -311,14 +334,6 @@ public class App extends PApplet {
         }
     }
 
-        /**
-     * Receive key released signal from the keyboard.
-     */
-    
-	@Override
-    public void keyReleased(){
-        
-    }
 
 @Override
     public void mousePressed(MouseEvent e) {
@@ -387,6 +402,7 @@ public class App extends PApplet {
         //TODO
         resetOccupied();
         drawBoard();
+        displayAccelerator();
         spawnIntervalCounterModifier();
         if(!isPaused && !isEnded){
             textSize(20);
@@ -425,24 +441,6 @@ public class App extends PApplet {
             textSize(20);
             text(" === TIME’S UP === ", width / 2, 30);  // Display "PAUSED" at the top
         }
-        //----------------------------------
-        //display score
-    
-        //----------------------------------
-        //TODO
-        
-        
-        //----------------------------------
-        //display time
-        //----------------------------------
-        //TODO
-        
-		//----------------------------------
-        //----------------------------------
-		//display game end message
-
-       
-
     }
 
     char[][] board;
@@ -475,6 +473,22 @@ public class App extends PApplet {
                     }
                 }
 
+                if (tileType == 'E'){
+                    acceleratorList.add(new Accelerator(x, y + 2, "right", E));
+                }
+
+                if (tileType == 'W'){
+                    acceleratorList.add(new Accelerator(x, y + 2, "top", W));
+                }
+
+                if (tileType == 'Q'){
+                    acceleratorList.add(new Accelerator(x, y + 2, "left", Q));
+                }
+
+                if (tileType == 'R'){
+                    acceleratorList.add(new Accelerator(x, y + 2, "bottom", R));
+                }
+
                 // Check for walls, while skipping balls and holes
                 if (tileType == 'X' || (tileType >= '1' && tileType <= '4')) {
                     // If the previous tile is not a ball or hole, add to wallsList
@@ -493,7 +507,7 @@ public class App extends PApplet {
     }
 
 
-     private void displayTime() {
+     public void displayTime() {
         long elapsedTime = (millis() - startTime) / 1000; // Calculate elapsed time in seconds
 
         String timeString = String.valueOf(elapsedTime); // Convert to String
@@ -508,7 +522,7 @@ public class App extends PApplet {
 // Function to handle ball sliding animation when balls are added or removed
 public void updateUpcomingBalls() {
     // Only animate if there are balls to slide and the animation is triggered
-    if (!ballsToSpawn.isEmpty() && shouldAnimate) {
+    if (shouldAnimate) {
         // Slide all balls to their target positions
         for (int i = 0; i < numDisplayedBalls; i++) {
             float targetX = i * (ballDisplaySize + 10);  // Target position for each ball
@@ -624,124 +638,124 @@ public void displayUpcomingBalls() {
 
 
 
-    private void drawBoard() {
-    for (int y = 2; y < BOARD_HEIGHT; y++) {
-        for (int x = 0; x < BOARD_WIDTH; x++) {
-            if (occupied[x][y]) {
-                continue;
-            }
-            
-            char tileType = board[x][y];
-            
-            switch (tileType) {
-                case 'X':
-                    if(!occupiedBall[x][y]){
-                    image(walls[0], x * CELLSIZE, y * CELLHEIGHT);
-                    }
-                    else{
-                        image(tile, x * CELLSIZE, y * CELLHEIGHT);
-                    }
-                    //println("x");
-                    break;
-                case '1':
-                    if(!occupiedBall[x][y]){
-                    image(walls[1], x * CELLSIZE, y * CELLHEIGHT);
-                    }
-                    else{
-                        image(tile, x * CELLSIZE, y * CELLHEIGHT);
-                    }
-                    //println("1");
-                    break;
-                case '2':
-                    if(!occupiedBall[x][y]){
-                    image(walls[2], x * CELLSIZE, y * CELLHEIGHT);
-                    }
-                    else{
-                        image(tile, x * CELLSIZE, y * CELLHEIGHT);
-                    }
-                    //println("2");
-                    break;
-                case '3':
-                    
-                    if(!occupiedBall[x][y]){
-                    image(walls[3], x * CELLSIZE, y * CELLHEIGHT);
-                    }
-                    else{
-                        image(tile, x * CELLSIZE, y * CELLHEIGHT);
-                    }
-                    //println("3");
-                    break;
-                case '4':
-                    if(!occupiedBall[x][y]){
-                    image(walls[4], x * CELLSIZE, y * CELLHEIGHT);
-                    }
-                    else{
-                        image(tile, x * CELLSIZE, y * CELLHEIGHT);
-                    }
-                    //println("4");
-                    break;
-                case 'S':
-                    image(spawner, x * CELLSIZE, y * CELLHEIGHT);
-                    //println("S");
-                    break;
-                case 'B':
-                    // Check for balls and their color
-                    if (x + 1 < BOARD_WIDTH && Character.isDigit(board[x + 1][y])) {
-                        String ballId = String.valueOf(tileType) + board[x + 1][y]; // e.g., "B0", "B1"
-                        int ballType = Character.getNumericValue(board[x + 1][y]);
-                        String ballColor = ballColorMap.get(ballId);
-                        if (ballId != null && !occupiedBall[x][y]) {
-                            spawnBallFromBoard(ballColor, x, y);
-                            occupiedBall[x][y] = true;
-                            occupiedBall[x+1][y]= true;
+    public void drawBoard() {
+        for (int y = 2; y < BOARD_HEIGHT; y++) {
+            for (int x = 0; x < BOARD_WIDTH; x++) {
+                if (occupied[x][y]) {
+                    continue;
+                }
+                
+                char tileType = board[x][y];
+                
+                switch (tileType) {
+                    case 'X':
+                        if(!occupiedBall[x][y]){
+                        image(walls[0], x * CELLSIZE, y * CELLHEIGHT);
                         }
-                        if(occupiedBall[x][y]){
+                        else{
                             image(tile, x * CELLSIZE, y * CELLHEIGHT);
                         }
-                    }
-                    break;
-                case 'H':
-                    // Check if it's a hole (e.g., H0, H1, etc.)
-                    if (tileType == 'H' && x + 1 < BOARD_WIDTH && Character.isDigit(board[x + 1][y])) {
-                        int holeType = Character.getNumericValue(board[x + 1][y]);
-                        image(holes[holeType], x * CELLSIZE, y * CELLHEIGHT, CELLSIZE * 2, CELLHEIGHT * 2); // Double size
+                        //println("x");
+                        break;
+                    case '1':
+                        if(!occupiedBall[x][y]){
+                        image(walls[1], x * CELLSIZE, y * CELLHEIGHT);
+                        }
+                        else{
+                            image(tile, x * CELLSIZE, y * CELLHEIGHT);
+                        }
+                        //println("1");
+                        break;
+                    case '2':
+                        if(!occupiedBall[x][y]){
+                        image(walls[2], x * CELLSIZE, y * CELLHEIGHT);
+                        }
+                        else{
+                            image(tile, x * CELLSIZE, y * CELLHEIGHT);
+                        }
+                        //println("2");
+                        break;
+                    case '3':
+                        
+                        if(!occupiedBall[x][y]){
+                        image(walls[3], x * CELLSIZE, y * CELLHEIGHT);
+                        }
+                        else{
+                            image(tile, x * CELLSIZE, y * CELLHEIGHT);
+                        }
+                        //println("3");
+                        break;
+                    case '4':
+                        if(!occupiedBall[x][y]){
+                        image(walls[4], x * CELLSIZE, y * CELLHEIGHT);
+                        }
+                        else{
+                            image(tile, x * CELLSIZE, y * CELLHEIGHT);
+                        }
+                        //println("4");
+                        break;
+                    case 'S':
+                        image(spawner, x * CELLSIZE, y * CELLHEIGHT);
+                        //println("S");
+                        break;
+                    case 'B':
+                        // Check for balls and their color
+                        if (x + 1 < BOARD_WIDTH && Character.isDigit(board[x + 1][y])) {
+                            String ballId = String.valueOf(tileType) + board[x + 1][y]; // e.g., "B0", "B1"
+                            int ballType = Character.getNumericValue(board[x + 1][y]);
+                            String ballColor = ballColorMap.get(ballId);
+                            if (ballId != null && !occupiedBall[x][y]) {
+                                spawnBallFromBoard(ballColor, x, y);
+                                occupiedBall[x][y] = true;
+                                occupiedBall[x+1][y]= true;
+                            }
+                            if(occupiedBall[x][y]){
+                                image(tile, x * CELLSIZE, y * CELLHEIGHT);
+                            }
+                        }
+                        break;
+                    case 'H':
+                        // Check if it's a hole (e.g., H0, H1, etc.)
+                        if (tileType == 'H' && x + 1 < BOARD_WIDTH && Character.isDigit(board[x + 1][y])) {
+                            int holeType = Character.getNumericValue(board[x + 1][y]);
+                            image(holes[holeType], x * CELLSIZE, y * CELLHEIGHT, CELLSIZE * 2, CELLHEIGHT * 2); // Double size
 
-                        // Mark the cells that are occupied by this larger hole
-                        occupied[x][y] = true;
-                        if (x + 1 < BOARD_WIDTH) {
-                            occupied[x + 1][y] = true;  // Right cell
+                            // Mark the cells that are occupied by this larger hole
+                            occupied[x][y] = true;
+                            if (x + 1 < BOARD_WIDTH) {
+                                occupied[x + 1][y] = true;  // Right cell
+                            }
+                            if (y + 1 < BOARD_HEIGHT) {
+                                occupied[x][y + 1] = true;  // Bottom cell
+                            }
+                            if (x + 1 < BOARD_WIDTH && y + 1 < BOARD_HEIGHT) {
+                                occupied[x + 1][y + 1] = true;  // Bottom-right cell
+                            }
+                            //println("hole"+ holeType);
+                            // Since the hole occupies two cells, skip the next x
+                            x++; 
+                        } else {
+                            image(tile, x * CELLSIZE, y * CELLHEIGHT); // Empty tile
                         }
-                        if (y + 1 < BOARD_HEIGHT) {
-                            occupied[x][y + 1] = true;  // Bottom cell
-                        }
-                        if (x + 1 < BOARD_WIDTH && y + 1 < BOARD_HEIGHT) {
-                            occupied[x + 1][y + 1] = true;  // Bottom-right cell
-                        }
-                        //println("hole"+ holeType);
-                        // Since the hole occupies two cells, skip the next x
-                        x++; 
-                    } else {
-                        image(tile, x * CELLSIZE, y * CELLHEIGHT); // Empty tile
-                    }
-                    break;
-                default:
-                    image(tile, x * CELLSIZE, y * CELLHEIGHT);
-                    break;
+                        break;
+                    default:
+                        image(tile, x * CELLSIZE, y * CELLHEIGHT);
+                        break;
+                }
             }
         }
     }
-}
 
     public void spawnBallFromSpawner(String ballId) {
-    if (spawners.isEmpty()) return; // No spawners found
+        if (spawners.isEmpty()) return; // No spawners found
 
-        // Randomly select a spawner
-        int[] spawnerPos = spawners.get(random.nextInt(spawners.size()));
-        int x = spawnerPos[0] * CELLSIZE;
-        int y = spawnerPos[1] * CELLHEIGHT;
-        Ball newBall = new Ball(x, y, ballId, balls); // Pass the balls array
-        activeBalls.add(newBall);
-    }
+            // Randomly select a spawner
+            int[] spawnerPos = spawners.get(random.nextInt(spawners.size()));
+            int x = spawnerPos[0] * CELLSIZE;
+            int y = spawnerPos[1] * CELLHEIGHT;
+            Ball newBall = new Ball(x, y, ballId, balls); // Pass the balls array
+            activeBalls.add(newBall);
+        }
 
     public void spawnBallFromBoard(String ballId, int xCor, int yCor){
         xCor = xCor * CELLSIZE;
@@ -756,7 +770,15 @@ public void displayUpcomingBalls() {
             for (int x = 0; x < BOARD_WIDTH; x++) {
                 occupied[x][y] = false;  // Reset the occupied flag
             }
-        }
+        }   
+    }
+
+    private void resetOccupiedBall(){
+        for (int y = 0; y < BOARD_HEIGHT; y++) {
+                for (int x = 0; x < BOARD_WIDTH; x++) {
+                    occupiedBall[x][y] = false;
+                }
+            }  
     }
 
     public void spawnIntervalCounterModifier() {
@@ -778,11 +800,10 @@ public void displayUpcomingBalls() {
         }
     }
 
-    private void BallMovement() {
+    public void BallMovement() {
         // Temporary list to store lines and balls to be removed after the loops
         List<PlayerLine> linesToRemove = new ArrayList<>();
         List<Ball> ballsToRemove = new ArrayList<>(); // List to keep track of balls that need to be removed
-
         for (Ball ball : activeBalls) {
             ball.update();
             ball.display(this); // Render the ball
@@ -793,8 +814,12 @@ public void displayUpcomingBalls() {
                 wall.handleCollision(ball);
             }
 
+            for (Accelerator accelerator : acceleratorList){
+                accelerator.applyAcceleration(ball);
+            }
+
             for (Hole hole : holesList) {
-                ball.attractToHole(hole); // Check attraction for each ball
+                ball.attractToHoles(holesList); // Check attraction for each ball
                 if (ball.captured) {
                     if (ball.isCaptureSuccessfulFlag) {
                         ballsToRemove.add(ball); // Mark ball for removal if captured successfully
@@ -835,58 +860,15 @@ public void displayUpcomingBalls() {
         }
     }
 
+    public void displayAccelerator(){
+        for (Accelerator accelerator : acceleratorList){
+                accelerator.display(this);
+            }
+    }
+
     public void removeLine(PlayerLine line) {
         playerLines.remove(line);
     }
-
-private long lastUpdateTime = 0; // Time of the last update
-private final long MOVE_INTERVAL = 67; // 0.067 seconds in milliseconds
-private int movesRemaining = TOTAL_MOVES; // Set the total moves here
-
-// Method to update yellow tile positions based on time
-private void updateYellowTiles() {
-    long currentTime = System.currentTimeMillis();
-
-    // Only update if enough time has passed
-    if (currentTime - lastUpdateTime >= MOVE_INTERVAL && movesRemaining > 0) {
-        // Update the last update time
-        lastUpdateTime = currentTime;
-
-        // Move yellow tile 1 (clockwise)
-        if (yellowTile1Y == 0 && yellowTile1X < BOARD_WIDTH - 1) {
-            yellowTile1X++;  // Move right
-        } else if (yellowTile1X == BOARD_WIDTH - 1 && yellowTile1Y < BOARD_HEIGHT - 1) {
-            yellowTile1Y++;  // Move down
-        } else if (yellowTile1Y == BOARD_HEIGHT - 1 && yellowTile1X > 0) {
-            yellowTile1X--;  // Move left
-        } else if (yellowTile1X == 0 && yellowTile1Y > 0) {
-            yellowTile1Y--;  // Move up
-        }
-
-        // Move yellow tile 2 (clockwise)
-        if (yellowTile2Y == BOARD_HEIGHT - 1 && yellowTile2X > 0) {
-            yellowTile2X--;  // Move left
-        } else if (yellowTile2X == 0 && yellowTile2Y > 0) {
-            yellowTile2Y--;  // Move up
-        } else if (yellowTile2Y == 0 && yellowTile2X < BOARD_WIDTH - 1) {
-            yellowTile2X++;  // Move right
-        } else if (yellowTile2X == BOARD_WIDTH - 1 && yellowTile2Y < BOARD_HEIGHT - 1) {
-            yellowTile2Y++;  // Move down
-        }
-
-        // Draw the updated positions of the yellow tiles
-        drawYellowTiles();
-
-        // Decrease the remaining moves
-        movesRemaining--;
-    }
-}
-
-// Method to draw yellow tiles at their final positions
-public void drawYellowTiles() {
-    image(walls[4], yellowTile1X * CELLSIZE, yellowTile1Y * CELLHEIGHT);
-    image(walls[4], yellowTile2X * CELLSIZE, yellowTile2Y * CELLHEIGHT);
-}
 
 // Call this method in your main draw loop
     public static void main(String[] args) {

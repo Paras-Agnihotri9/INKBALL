@@ -9,11 +9,11 @@ public class Hole {
     private static final float HOLE_RADIUS = 32; // Radius for attraction zone
     private static final float ATTRACTION_FORCE = 0.005f; // 0.5% as a proportion
 
-<span class="nc" id="L12">    public Hole(float x, float y, char type) {</span>
-<span class="nc" id="L13">        this.x = x;</span>
-<span class="nc" id="L14">        this.y = y;</span>
-<span class="nc" id="L15">        this.type = type;</span>
-<span class="nc" id="L16">    }</span>
+<span class="fc" id="L12">    public Hole(float x, float y, char type) {</span>
+<span class="fc" id="L13">        this.x = x;</span>
+<span class="fc" id="L14">        this.y = y;</span>
+<span class="fc" id="L15">        this.type = type;</span>
+<span class="fc" id="L16">    }</span>
 
     public float getX() {
 <span class="nc" id="L19">        return x;</span>
@@ -24,11 +24,11 @@ public class Hole {
     }
 
     public float getCenterX() {
-<span class="nc" id="L27">        return ((x+1) * App.CELLHEIGHT); // Center X of the hole</span>
+<span class="fc" id="L27">        return ((x+1) * App.CELLHEIGHT); // Center X of the hole</span>
     }
 
     public float getCenterY() {
-<span class="nc" id="L31">        return ((y+1) * App.CELLHEIGHT); // Center Y of the hole</span>
+<span class="fc" id="L31">        return ((y+1) * App.CELLHEIGHT); // Center Y of the hole</span>
     }
 
 }
